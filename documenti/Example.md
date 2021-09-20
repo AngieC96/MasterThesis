@@ -444,41 +444,35 @@ The initial state is $s_0 = (x_g, 0, \mathcal C = \{1,2,3,4\})$. We have $4$ pos
 
 ```mermaid
 flowchart LR
-    s_0    -->|a=1| s_01
-    s_01   -->|a=2| s_012
-    s_012  -->|a=3| s0123
-    s_012  -->|a=4| s0124
-    s0124  -->|a=3| s01243
-    s_01   -->|a=3| s_013
-    s_013  -->|a=2| s_0132
-    s_01   -->|a=4| s_014
-    s_014  -- a=2 --> s_0142
-    s_0142 -- a=3 --> s_01423
-    s_014  -- a=3 --> s_0143
-    s_0143 -- a=2 --> s_01432
+    s_0                 -- a=1 --> s_01
+    s_0                 -- a=2 --> s_012=s_02
+    s_01                -- a=2 --> s_012=s_02
+    s_0                 -- a=4 --> s_04
     
-    s_0   -- a=2 --> s_02
-    s_02  -- a=3 --> s_023
-    s_02  -- a=4 --> s_024
-    s_024 -- a=3 --> s_0243
+    s_014               -- a=3 --> s_013=s_0143=s_0413
+    s_041               -- a=3 --> s_013=s_0143=s_0413
+    s_01                -- a=3 --> s_013=s_0143=s_0413
     
-    s_0   -- a=3 --> s_03
-    s_03  -- a=1 --> s_031
-    s_031 -- a=2 --> s_0312
-    s_03  -- a=2 --> s_032
+    s_01                -- a=4 --> s_014
+    s_04                -- a=1 --> s_041
+    s_012=s_02          -- a=4 --> s_0124=s_024
     
-    s_0    -- a=4 --> s_04
-    s_04   -- a=1 --> s_041
-    s_041  -- a=2 --> s_0412
-    s_0412 -- a=3 --> s_04123
-    s_041  -- a=3 --> s_0413
-    s_0413 -- a=2 --> s_04132
-    s_04   -- a=2 --> s_042
-    s_042  -- a=3 --> s_0423
-    s_04   -- a=3 --> s_043
-    s_043  -- a=1 --> s_0431
-    s_0431 -- a=2 --> s_04312
-    s_043  -- a=2 --> s_0432
+    s_04                -- a=2 --> s_0142=s_0412=s_042
+    s_014               -- a=2 --> s_0142=s_0412=s_042
+    s_041               -- a=2 --> s_0142=s_0412=s_042
+    
+    s_03=s_043          -- a=1 --> s_031=s_0431
+    
+    s_04                -- a=3 --> s_03=s_043
+    s_0                 -- a=3 --> s_03=s_043
+    
+    s_013=s_0143=s_0413 -- a=2 --> s_t1
+    s_03=s_043          -- a=2 --> s_t1
+    s_031=s_0431        -- a=2 --> s_t1
+    
+    s_012=s_02          -- a=3 --> s_t2
+    s_0124=s_024        -- a=3 --> s_t2
+    s_0142=s_0412=s_042 -- a=3 --> s_t2
 ```
 
 There are $33$ states, instead of the $64$ we estimated. The terminal states are $s = (x_g, v_k, \varnothing)$, but we have that $v_k$ must be one of the two substations near the fault, or the substation in which we have the fault. So there are at most two terminal states. In this example, they are $s_{t_1} = (x_g, 2, \varnothing)$ and $s_{t_2} = (x_g, 3, \varnothing)$. Besides, there are some states that are equal, so they are actually less than 33.
@@ -518,11 +512,89 @@ $$
 $$
 We have that the initial state is $s_0=(x_g, 0, \{1,2,3,4\})$. So
 $$
-\eta_\pi (s_0) = \frac1{2N+1} \mathbb I \big(v_k = 0, \{1,2,3,4\} = \mathcal C \big) + 0 = \frac1{2\cdot 4 + 1} \cdot 1 = \frac1{7}
+\eta_\pi (s_0) = \frac1{2N+1} \mathbb I \big(v_k = 0, \{1,2,3,4\} = \mathcal C \big) + 0 = \frac1{2\cdot 4 + 1} \cdot 1 = \frac19
 \tag{2.1}
 $$
 Then we have that:
 $$
-\eta_\pi (s_{01}) = 0 + \frac1{|\{v\}|} \eta_\pi( s_0)
+\eta_\pi (s_{01}) = 0 + \frac1{|\{1,2,3,4\}|} \eta_\pi(s_0) = \frac14 \cdot \frac19 = \frac1{36}
 \tag{2.2}
+$$
+
+$$
+\eta_\pi (s_{012}=s_{02}) = 0 + \frac14 \eta_\pi (s_0) + \frac13 \eta_\pi (s_{01}) = \frac14 \cdot \frac19 + \frac13 \cdot \frac1{36} = \frac1{27}
+\tag{2.3}
+$$
+
+$$
+\eta_\pi(s_{0124}=s_{024}) = 0 + \frac12 \eta_\pi(s_{012}=s_{02}) = \frac12 \cdot \frac1{27} = \frac1{54}
+\tag{2.4}
+$$
+
+$$
+\eta_\pi(s_{014}) = 0 + \frac13 \eta_\pi(s_{01}) = \frac13 \cdot \frac1{36} = \frac1{108}
+\tag{2.5}
+$$
+
+$$
+\eta_\pi(s_{04}) = 0 + \frac14 \eta_\pi(s_0) = \frac14 \cdot \frac19 = \frac1{36}
+\tag{2.6}
+$$
+
+$$
+\eta_\pi(s_{041}) = 0 + \frac13 \eta_\pi(s_{04}) = \frac13 \cdot \frac1{36} = \frac1{108}
+\tag{2.7}
+$$
+
+$$
+\begin{aligned}
+\eta_\pi(s_{013}=s_{0143}=s_{0413}) &= 0 + \frac12 \eta_\pi(s_{014}) + \frac12 \eta_\pi(s_{041}) + \frac13 \eta_\pi(s_{01}) \\
+&= \frac12 \cdot \frac1{108} + \frac12 \cdot \frac1{108} + \frac13 \cdot \frac1{36} \\
+&= \left( \frac12 + \frac12 + 1 \right) \frac1{108} = \frac1{54}
+\end{aligned}
+\tag{2.8}
+$$
+
+$$
+\begin{aligned}
+\eta_\pi(s_{0142} = s_{0412} = s_{042}) &= 0 + \frac12 \eta_\pi(s_{014}) + \frac13 \eta_\pi(s_{04}) + \frac12 \eta_\pi(s_{041})\\
+&= \frac12 \cdot \frac1{108} + \frac13 \cdot \frac1{36} + \frac12 \cdot \frac1{108} \\
+&= \left( \frac12 + 1 + \frac12 \right) \frac1{108} = \frac1{54}
+\end{aligned}
+\tag{2.9}
+$$
+
+$$
+\eta_\pi(s_{03} = s_{043}) = 0 + \frac14 \eta_\pi(s_0) + \frac13 \eta_\pi(s_{04}) = \frac14 \cdot \frac19 + \frac13 \cdot \frac1{36} = \frac1{27}
+\tag{2.10}
+$$
+
+$$
+\eta_\pi(s_{031} = s_{0431}) = 0 + \frac12 \eta_\pi(s_{03} = s_{043}) = \frac12 \cdot \frac1{27} = \frac1{54}
+\tag{2.11}
+$$
+
+$$
+\begin{aligned}
+\eta_\pi(s_{t_1}) &= 0 + 1 \cdot \eta_\pi(s_{013}=s_{0143}=s_{0413}) + \frac12 \eta_\pi(s_{03}=s_{043}) + 1 \cdot \eta_\pi(s_{031}=s_{0431}) \\
+&= \frac1{54} + \frac12 \cdot \frac1{27} + \frac1{54} = \frac3{54} = \frac1{18}
+\end{aligned}
+\tag{2.12}
+$$
+
+$$
+\begin{aligned}
+\eta_\pi(s_{t_2}) &= 0 + \frac12 \eta_\pi(s_{012}=s_{02}) + 1 \cdot \eta_\pi(s_{0124}=s_{024}) + 1 \cdot \eta_\pi(s_{0142}=s_{0412}=s_{042}) \\
+&= \frac12 \cdot \frac1{27} + \frac1{54} + \frac1{54} = \frac3{54} = \frac1{18}
+\end{aligned}
+\tag{2.13}
+$$
+
+
+
+### Compute the gradient
+
+$$
+\nabla_\theta J = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_\theta \pi(a|s) \, .
+\nonumber
 $$
