@@ -1,0 +1,113 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                         %
+% Title: Master Thesis                                    %
+%                                                         %
+% Author:        Angela Carraro                           %
+% Supervisor:    Antonio Celani                           %
+% Cosupervisors: Andrea Zancola, Luca Bortolussi          %
+%                                                         %
+% Language: English                                       %
+%                                                         %
+% Character set encoding: UTF-8                           %
+%                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,11pt,twoside]{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Basic class definitions, typesetting, bibliography      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage[T1]{fontenc}   % Changes the font
+\usepackage[utf8]{inputenc}
+\usepackage[italian,english]{babel}
+\usepackage{natbib}
+
+\usepackage{lipsum}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Graphics                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{tikz}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapter/sections/etc visual style                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Chapters: square around number
+\usepackage{titlesec}             % Easier section customizations
+
+\newcommand*{\chapnumfont}{\normalfont\sffamily\huge\bfseries}
+\titleformat{\chapter}[display]
+{\filleft\bfseries\sffamily}
+{\filleft%
+    \topskip0pt
+    \raisebox{0.78cm}{\huge Chapter }
+    \begin{tikzpicture}
+        %\draw[fill,color=black] (0,0) rectangle (2cm,2cm);
+        %\draw[color=white] (1cm,1cm) node {\chapnumfont\thechapter};
+        \draw[line width=2pt,color=black] (0,0) rectangle (2cm,2cm);
+        \draw[color=black] (1cm,1cm) node {\chapnumfont\thechapter};
+    \end{tikzpicture}
+}
+{20pt}
+{\Huge}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Actual text                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\frontmatter
+
+\input{frontmatter/titlepage}
+
+\include{frontmatter/abstract}
+
+% Table of contents
+\tableofcontents
+
+
+\mainmatter
+
+% Introduction
+\include{chapters/1_introduction}
+
+
+\part{Data Management}
+
+\include{chapters/2_chapter2}
+
+\include{chapters/3_chapter3}
+
+
+\part{Algorithms}
+
+\include{chapters/4_chapter4}
+
+\include{chapters/5_chapter5}
+
+
+\part{Finance}
+
+\include{chapters/6_chapter6}
+
+%\backmatter
+
+\include{chapters/7_conclusion}
+
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
