@@ -345,7 +345,7 @@ The initial state is $s_0 = (x_g, 0, \mathcal C = \{1,2,3,4\})$. We have $4$ pos
       $$
     
       $$
-      Q_\pi(s_{041}, 2) - Q(s_{0412}, 3) = 162048
+      Q_\pi(s_{041}, 2) - Q(s_{0412}, 3) = 190533
       \label{eq:23}\tag{1.23}
       $$
       
@@ -485,21 +485,21 @@ $s_{02} = s_{012} \Rightarrow Q(_{02}, 3) = Q(_{012},3) \Rightarrow \eqref{eq:14
 
 $s_{024} = s_{0124} \Rightarrow Q(s_{024},3) = Q(s_{0124},3) \Rightarrow \eqref{eq:16} = \eqref{eq:5}$.
 
-|                                                   | $a=1$                                          | $a=2$                                                | $a=3$                                                  | $a=4$                                                |
-| ------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
-| $s_0 = (x_g, 0, \{1,2,3,4\})$                     | $Q(s_0, 1) = 478819,167 \, \eqref{eq:1}$       | $Q(s_0,2) = 568610 \, \eqref{eq:13}$                 | $Q(s_0,3) = 312331 \, \eqref{eq:17}$                   | $Q(s_0,4) = 505830,167 \, \eqref{eq:21}$             |
-| $s_{01} = (x_g, 1, \{2,3,4\})$                    |                                                | $Q_\pi(s_{01}, 2) = 524291 \, \eqref{eq:2}$          | $Q(s_{01},3) = 215949 \, \eqref{eq:6}$                 | $Q(s_{01},4) = 331348.5 \, \eqref{eq:8}$             |
-| $s_{012} = (x_g, 2, \{3,4\}) = s_{02}$            |                                                |                                                      | $Q(s_{012},3) = 152216 \, \eqref{eq:3}\eqref{eq:14}$   | $Q(s_{012},4) = 398016 \, \eqref{eq:4}\eqref{eq:15}$ |
-| $s_{0124} = (x_g, 4, \{3\}) = s_{024}$            |                                                |                                                      | $Q(s_{0124},3) = 157184 \, \eqref{eq:5}\eqref{eq:16}$  |                                                      |
-| $s_{013} = (x_g, 3, \{2\}) = s_{0143} = s_{0413}$ |                                                | $Q(s_{013}, 2) = 16155 \, \eqref{eq:7}\eqref{eq:12}$ |                                                        |                                                      |
-| $s_{014} = (x_g, 4, \{2,3\})$                     |                                                | $Q(s_{014},2) = 262872 \, \eqref{eq:9}$              | $Q(s_{014},3) = 200969 \, \eqref{eq:11}$               |                                                      |
-| $s_{0142} = (x_g, 2, \{3\}) = s_{0412} = s_{042}$ |                                                |                                                      | $Q(s_{0142}, 3) = 91904 \, \eqref{eq:10}\eqref{eq:24}$ |                                                      |
-| $s_{03} = (x_g, 3, \{1, 2\}) = s_{043}$           | $Q_\pi(s_{03}, 1) = 91107 \, \eqref{eq:18}$    | $Q(s_{03}, 2) = 52773 \, \eqref{eq:20}$              |                                                        |                                                      |
-| $s_{031} = (x_g, 1, \{2\}) = s_{0431}$            |                                                | $Q(s_{031}, 2) = 28485 \, \eqref{eq:19}$             |                                                        |                                                      |
-| $s_{04} = (x_g, 4, \{1, 2, 3\})$                  | $Q_\pi(s_{04}, 1) = 284602,5 \, \eqref{eq:22}$ | $Q_\pi(s_{04}, 2) = 320808 \, \eqref{eq:27}$         | $Q_\pi(s_{04}, 3) = 319382 \, \eqref{eq:29}$           |                                                      |
-| $s_{041} = (x_g, 1, \{2,3\})$                     |                                                | $Q_\pi(s_{041}, 2) = 253952 \, \eqref{eq:23}$        | $Q_\pi(s_{041}, 3) = 144381 \, \eqref{eq:25}$          |                                                      |
-| $s_{t_1} = (x_g, 2, \varnothing)$                 |                                                |                                                      |                                                        |                                                      |
-| $s_{t_2} = (x_g, 3, \varnothing)$                 |                                                |                                                      |                                                        |                                                      |
+|                                                   | $a=1$                                       | $a=2$                                                | $a=3$                                                  | $a=4$                                                |
+| ------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| $s_0 = (x_g, 0, \{1,2,3,4\})$                     | $Q(s_0, 1) = 494719.8333 \, \eqref{eq:1}$   | $Q(s_0,2) = 568610 \, \eqref{eq:13}$                 | $Q(s_0,3) = 312331 \, \eqref{eq:17}$                   | $Q(s_0,4) = 510577,666 \, \eqref{eq:21}$             |
+| $s_{01} = (x_g, 1, \{2,3,4\})$                    |                                             | $Q_\pi(s_{01}, 2) = 571993 \, \eqref{eq:2}$          | $Q(s_{01},3) = 215949 \, \eqref{eq:6}$                 | $Q(s_{01},4) = 331348.5 \, \eqref{eq:8}$             |
+| $s_{012} = (x_g, 2, \{3,4\}) = s_{02}$            |                                             |                                                      | $Q(s_{012},3) = 152216 \, \eqref{eq:3}\eqref{eq:14}$   | $Q(s_{012},4) = 398016 \, \eqref{eq:4}\eqref{eq:15}$ |
+| $s_{0124} = (x_g, 4, \{3\}) = s_{024}$            |                                             |                                                      | $Q(s_{0124},3) = 157184 \, \eqref{eq:5}\eqref{eq:16}$  |                                                      |
+| $s_{013} = (x_g, 3, \{2\}) = s_{0143} = s_{0413}$ |                                             | $Q(s_{013}, 2) = 16155 \, \eqref{eq:7}\eqref{eq:12}$ |                                                        |                                                      |
+| $s_{014} = (x_g, 4, \{2,3\})$                     |                                             | $Q(s_{014},2) = 262872 \, \eqref{eq:9}$              | $Q(s_{014},3) = 200969 \, \eqref{eq:11}$               |                                                      |
+| $s_{0142} = (x_g, 2, \{3\}) = s_{0412} = s_{042}$ |                                             |                                                      | $Q(s_{0142}, 3) = 91904 \, \eqref{eq:10}\eqref{eq:24}$ |                                                      |
+| $s_{03} = (x_g, 3, \{1, 2\}) = s_{043}$           | $Q_\pi(s_{03}, 1) = 91107 \, \eqref{eq:18}$ | $Q(s_{03}, 2) = 52773 \, \eqref{eq:20}$              |                                                        |                                                      |
+| $s_{031} = (x_g, 1, \{2\}) = s_{0431}$            |                                             | $Q(s_{031}, 2) = 28485 \, \eqref{eq:19}$             |                                                        |                                                      |
+| $s_{04} = (x_g, 4, \{1, 2, 3\})$                  | $Q_\pi(s_{04}, 1) = 298845\, \eqref{eq:22}$ | $Q_\pi(s_{04}, 2) = 320808 \, \eqref{eq:27}$         | $Q_\pi(s_{04}, 3) = 319382 \, \eqref{eq:29}$           |                                                      |
+| $s_{041} = (x_g, 1, \{2,3\})$                     |                                             | $Q_\pi(s_{041}, 2) = 282437 \, \eqref{eq:23}$        | $Q_\pi(s_{041}, 3) = 144381 \, \eqref{eq:25}$          |                                                      |
+| $s_{t_1} = (x_g, 2, \varnothing)$                 |                                             |                                                      |                                                        |                                                      |
+| $s_{t_2} = (x_g, 3, \varnothing)$                 |                                             |                                                      |                                                        |                                                      |
 
 
 
@@ -507,7 +507,7 @@ $s_{024} = s_{0124} \Rightarrow Q(s_{024},3) = Q(s_{0124},3) \Rightarrow \eqref{
 
 The function $\rho_0(s')$ is the probability of starting in the initial state $s'$. Since we don't have any prior information of where the fault might be, $\rho_0$ doesn't depend on it, so $\rho_0$ will be uniform in $x_g$ (this means that we divide by the number of possible positions of $x_g$, which is either a substation or an edge, so it is $N + (N+1) = 2N+1$). Instead, the first substation in which to go is the "fake" substation $0$ and the set of disconnected substations must be equal to the set of all the substations $\mathcal C$. So $\rho_0$ must be $1$ when $v_k = 0$ and the set of the disconnected substations is equal to $\mathcal C$ and must be $0$ for every other state. So we have that
 $$
-\rho_0 \Big(s = (x_g, v_k, \{v\}) \Big) = \frac1{2|\mathcal C|+1} \mathbb I \big(v_k = 0, \{v\} = \mathcal C \big) = \frac1{2N+1} \mathbb I \big(\{v\} = \mathcal C \big)
+\rho_0 \Big(s = (x_g, v_k, \{v\}) \Big) = \frac1{2|\mathcal C|+1} \mathbb I \big(v_k = 0, \{v\} = \mathcal C \big) = \frac1{2N+1} \mathbb I \big( v_k = 0, \{v\} = \mathcal C \big)
 \nonumber
 $$
 We have that the initial state is $s_0=(x_g, 0, \{1,2,3,4\})$. So
@@ -592,9 +592,75 @@ $$
 
 
 
+#### Automatic computation of $Q$ and $\eta$
+
+We want to find an automatic way to compute the matrix $Q$ and the vector $\eta$. We have that
+$$
+Q[s,a]  = P[s,a|s',a'] Q[s',a'] + R[s,a]
+$$
+ where $Q,P$ and $R$ are matrices. The matrix $R[s,a]$ represents the immediate cost of being in state $s$ and doing action $a$, ==e devi averla numerica, ma la matrice P ti conviene costruirla in modo "automatico".==
+
+The matrix $R$ is computed using:
+$$
+R \Big[ s = (x_g,v_k,\{v\}), a \Big] = d_{v_k,a} \cdot \sum_{v \in \{v\}} u_v \,,
+$$
+so we have that, referencing the table of $Q$:
+$$
+R = \begin{bmatrix}
+121623 & 293494 & 240391 & 197566 \\
+     0 & 296877 & 199794 &  99428 \\
+     0 &      0 & 152216 & 240832 \\
+     0 &      0 & 157184 &      0 \\
+     0 &  16155 &      0 &      0 \\
+     0 & 170968 & 184814 &      0 \\
+     0 &      0 &  91904 &      0 \\
+ 62622 &  52773 &      0 &      0 \\
+     0 &  28485 &      0 &      0 \\
+ 85436 & 228904 & 247442 &      0 \\
+     0 & 190533 & 128226 &      0 \\
+     0 &        &      0 &      0 \\
+     0 &        &      0 &      0 \\
+\end{bmatrix}
+$$
+The matrix $P$ is computed using:
+$$
+\begin{aligned}
+P \Big[ s' = (x_g,v_{k+1},\{v'\}), a' \Big| s = (x_g,v_k,\{v\}), a \Big] &:= \mathbb P\text{rob} \Big( s' = (x_g,v_{k+1},\{v'\}), a' \Big| s = (x_g,v_k,\{v\}), a \Big) \\
+&= \delta_{a, v_{k+1}} \cdot \frac1{|\{v'\}|}
+\end{aligned}
+$$
+so we have that
+$$
+P = \begin{bmatrix}
+           & s_0, 1  & s_0, 2  & s_0, 3 & s_0, 4 & s_{01}, 1 & s_{01}, 2 & s_{01}, 3 & s_{01}, 4 & s_{012}, 1 & s_{012}, 2 & \ldots \\
+s_0, 1     & 0       & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_0, 2     & 0       & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_0, 3     & 0       & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_0, 4     & 0       & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_{01}, 1  & \frac13 & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_{01}, 2  & \frac13 & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_{01}, 3  & \frac13 & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_{01}, 4  & \frac13 & 0       & 0      & 0      & 0         & 0         &           &           &            &            &        \\
+s_{012}, 1 & 0       & \frac12 & 0      & 0      & 0         & \frac12   &           &           &            &            &        \\
+s_{012}, 2 & 0       & \frac12 & 0      & 0      & 0         & \frac12   &           &           &            &            &        \\
+s_{012}, 3 & 0       & \frac12 & 0      & 0      & 0         & \frac12   &           &           &            &            &        \\
+s_{012}, 4 & 0       & \frac12 & 0      & 0      & 0         & \frac12   &           &           &            &            &        \\
+\vdots     &         &         &        &        &           &           &           &           &            &            &       
+\end{bmatrix}
+$$
+
+
 ### Compute the gradient
 
 $$
 \nabla_\theta J = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_\theta \pi(a|s) \, .
 \nonumber
+$$
+
+Since $\pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) = \frac{e^{\theta_a y}}{\sum_{b \in |A|} e^{\theta_b y}}$, we have that
+$$
+\begin{aligned}
+\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_a y}}{\sum_{b \in |A|} e^{\theta_b y}} \right) \\
+&= \ldots
+\end{aligned}
 $$
