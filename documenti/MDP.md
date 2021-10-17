@@ -50,7 +50,7 @@ We define the cost of the process as the amount of time each underlying user of 
 
 In this MDP we have that
 
-- the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variables $v_k$ and $\{v\}$ are **observable**, while the variable $x_g$ is **hidden**.
+- the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variable $x_g$ is **hidden**, while the variables $v_k$ and $\{v\}$ are **observable**, and we will sometimes write $s=(x_g, o)$ where $o = (v_k, \{v\})$ is the observation.
   When the fault occurs the technician can be everywhere: at home if it is the middle of the night, at the company, be around, etc. So we introduce an extra "fake" substation, called substation $0$, that is the position of the technician when the fault occurs. So the **initial state** is always $s_0 = (x_g, 0, \mathcal C)$.
   Instead, the **terminal state** is of the form $s_t = (x_g, v_k, \varnothing)$, where we have that, if the fault is on a cable, $v_k$ will be one of the two substations at the ends of that faulty cable , so we would have two terminal states, while if the fault is in a substation, $v_k$ would be that exact substation, so the terminal state would be only one.
   So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric <!--[12:30 ???]-->
@@ -78,7 +78,11 @@ In this MDP we have that
 
 
 
-Since we know every aspect of the problem and we have a model of the environment, this is a **<font color="00ADEF">model-based</font>** problem. Besides, this is a problem of **<font color="00ADEF">partial observability</font>**, since part of the state $s$ is hidden, which is the position of the fault $x_g$, that we don't know. So, we can not solve it using dynamic programming, because in this way the policy would depend on the whole state, thus also on the hidden state, which can not be.
+Since we know every aspect of the problem and we have a model of the environment, this is a **<font color="00ADEF">model-based</font>** problem. Besides, this is a problem of **<font color="00ADEF">partial observability</font>**, since part of the state $s$ is hidden, which is the position of the fault $x_g$, that we don't know (in partially observable problems the full state is not available to the agent). So, we can not solve it using dynamic programming, because in this way the policy would depend on the whole state, thus also on the hidden state, which can not be.
+
+The partial observability of the system stems from the fact that multiple states give the same sensor reading, since the agent can only sense a limited part of the environment. The partial observability can lead to "perceptual aliasing": different parts of the environment appear similar to the agent's sensor system, but require different actions. 
+
+An example of obtaining Markov states through a state-update function is provided by the popular Bayesian approach known as *Partially Observable MDPs*, or *POMDPs*. In this approach the environment is assumed to have a well defined *latent state* $X_t$ that underlies and produces the environment's observations, but is never available to the agent (and is not to be confused with the state $S_t$ used by the agent to make predictions and decisions). The natural Markov state, $S_t$, for a POMDP is the *distribution* over the latent states given the history, called the *belief state*. [pag 467 (489) [^1]]
 
 Actually, if we know where the fault is, the solution is straightforward: if it is on an edge to solve the fault we need to visit the two substations at the ends of it (we might have to choose the right order), if it is in a substation we visit it directly.
 
@@ -97,12 +101,16 @@ p(s' | s,a) = \begin{cases}
 \end{cases} \,.
 \label{eq:transprob}
 $$
+
+
+It is somewhat surprising and not widely recognized that function approximation includes important aspects of partial observability. For example, if there is a state variable that is not observable, then the parameterization can be chosen such that the approximate value does not depend on that state variable. The effect is just as if the state variable were not observable. Because of this, all the results obtained for the parameterized case apply to partial observability without change. In this sense, the case of parameterized function approximation includes the case of partial observability.  [^1]
+
 Since we don't know where the failure is, the **<font color="00ADEF">policy</font>** depends only on the observable states, so it doesn't know where the fault is. Let's define a parameterized policy using Boltzmann parameterization:
 $$
-\pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})), \theta \Big) = \frac{e^{\theta_a y}}{\sum_{b \in \mathcal A} e^{\theta_b y}} \,.
+\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})), \theta \Big) = \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \,.
 \label{eq:parameterizedpolicy}
 $$
-where $\theta$ are the parameters for each action, so $\theta = (\theta_1, \theta_2, \ldots, \theta_N)$ (where $N$ is the number of substations, so the number of possible actions), which depends only on the observable variable $y$.
+where $\theta$ are the parameters for each action, so $\theta = (\theta_1, \theta_2, \ldots, \theta_N)$ (where $N$ is the number of substations, so the number of possible actions), which depends on the action and on the observable variable $o$.
 
 If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states.
 
@@ -207,7 +215,7 @@ where $\mathrm{pa}(s')$ indicates the parents of the node $s'$ in the dependency
 
 **Idea of the algorithm:** We start from a certain policy, for example the random policy of equation $\eqref{eq:rndpolicy}$, in which we choose randomly the substation to be visited. This means that in the parameterized policy $\eqref{eq:parameterizedpolicy}$ all the parameters $\theta$ are equal to $0$: $\theta = 0 = (0, 0, \ldots, 0)$. This is because in the random policy the parameters $\theta$ don't depend on the action $a$, so we have that
 $$
-\pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) = \frac{e^{\theta y}}{\sum_{b \in \{v\}} e^{\theta y}} = \frac{e^{\theta y}}{e^{\theta y} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
+\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) = \frac{e^{\theta_o}}{\sum_{b \in \{v\}} e^{\theta_o}} = \frac{e^{\theta_o}}{e^{\theta_o} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
 \label{eq:policy}
 $$
 This is true for every choice of $\theta$ which doesn't depend on the action, but in practice to construct a uniform policy we take $\theta = 0 = (0, 0, \ldots, 0)$. But notice that this is not the only way.
@@ -260,15 +268,15 @@ $$
 Given the equation for the policy in $\eqref{eq:parameterizedpolicy}$, we have that its derivative is
 $$
 \begin{aligned}
-\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_a y}}{\sum_{b \in |A|} e^{\theta_b y}} \right) \\
-&= \frac{\delta_{a,c} \cdot e^{\theta_a y} \cdot y \cdot \sum_{b \in |A|} e^{\theta_b y} -  e^{\theta_a y} \cdot e^{\theta_c y} \cdot y}{(\sum_{b \in |A|} e^{\theta_b y})^2} \\
-&= y \left( \frac{\delta_{a,c} \cdot e^{\theta_a y} \cdot \sum_{b \in |A|} e^{\theta_b y}}{(\sum_{b \in |A|} e^{\theta_b y})^2} - \frac{e^{\theta_a y}}{\sum_{b \in |A|} e^{\theta_b y}}\cdot\frac{e^{\theta_c y}}{\sum_{b \in |A|} e^{\theta_b y}} \right) \\
-&= y \left( \delta_{a,c} \pi(a) - \pi(a) \pi(c) \right)
+\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \right) \\
+&= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} } -  e^{\theta_{a_o} } \cdot e^{\theta_{c,o} }}{(\sum_{b \in \{v\}} e^{\theta_b y})^2} \\
+&= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} }}{(\sum_{b \in \{v\}} e^{\theta_{b,o} })^2} - \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }}\cdot\frac{e^{\theta_{c,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \\
+&= \delta_{a,c} \pi(a) - \pi(a) \pi(c)
 \end{aligned}
 $$
 When $\theta = 0$ we have that
 $$
-\left. \frac{\partial}{\partial \theta_c} \pi(a) \right|_{\theta=0} = y \left( \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2} \right)
+\left. \frac{\partial}{\partial \theta_c} \pi(a) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
 \label{eq:derivpi}
 $$
 <!--[38:30] I termini di $Q$ pesando in modo diverso questi valori: le $Q$ più alte prendono un gradiente positivo più alto-->
@@ -291,3 +299,6 @@ Another option that can be done both at the level of the deterministic gradient 
 
 The improvement is that instead of having a gradient that reaches a horizontal asymptote, the gradient keeps on moving and doesn't slow down. This allows to reach the convergence faster.
 
+
+
+[^1]: Sutton and Barto, Reinforcement Learning: An Introduction, 2018, MIT Press.
