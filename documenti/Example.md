@@ -52,7 +52,7 @@ We have that the fault is $x_g = 2 - 3$ (a branch is identified by an ID or its 
 
 So we have that the initial parameters are $\theta = 0$, so the policy is:
 $$
-\pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) = \frac{e^{\theta y}}{\sum_{b \in |A|} e^{\theta y}} = \frac{e^{\theta y}}{e^{\theta y} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
+\pi \Big( a \;\big|\; s = (x_g, y=(v_k, \{v\})) \Big) = \frac{e^{\theta}}{\sum_{b \in \{v\}} e^{\theta}} = \frac{e^{\theta}}{e^{\theta} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
 \nonumber
 $$
 The equations are:
@@ -62,7 +62,7 @@ Q_\pi\Big( s = (x_g,v_k,\{v\}), a \Big) = d_{v_k, a} \cdot n_{k+1} + \sum_{a' \i
 $$
 
 $$
-\eta_\pi \Big(s'=(x_g, v_{k+1}, \{v'\}) \Big) = \frac1{N^2} \mathbb I \big(\{v'\} = \mathcal C \big) + \sum_s \frac1{|\{v\}|} \eta_\pi \Big( s = (x_g, v_{k}, \{v\}) \Big)
+\eta_\pi \Big(s'=(x_g, v_{k+1}, \{v'\}) \Big) = \frac1{2N+1} \mathbb I \big( v_k = 0, \{v'\} = \mathcal C \big) + \sum_s \frac1{|\{v\}|} \eta_\pi \Big( s = (x_g, v_{k}, \{v\}) \Big)
 \nonumber
 $$
 
