@@ -110,7 +110,7 @@ $$
 \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})), \theta \Big) = \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \,.
 \label{eq:parameterizedpolicy}
 $$
-where $\theta$ are the parameters for each action, so $\theta = (\theta_1, \theta_2, \ldots, \theta_N)$ (where $N$ is the number of substations, so the number of possible actions), which depends on the action and on the observable variable $o$.
+where $\theta$ are the parameters for each action, so $\theta = (\theta_1, \theta_2, \ldots, \theta_N)^\top$ (where $N$ is the number of substations, so the number of possible actions), which depends on the action and on the observable variable $o$.
 
 If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states.
 
@@ -265,6 +265,15 @@ $$
 \nonumber
 $$
 
+Given that the vector $\theta$ is $\theta = (\theta_1, \theta_2, \ldots, \theta_N)^\top$, where $N$ is the number of substations, we have that
+$$
+\nabla_\theta J = \begin{pmatrix}
+\frac{\partial}{\partial \theta_1} J \\
+\frac{\partial}{\partial \theta_2} J \\
+\vdots \\
+\frac{\partial}{\partial \theta_N} J
+\end{pmatrix} \, .
+$$
 Given the equation for the policy in $\eqref{eq:parameterizedpolicy}$, we have that its derivative is
 $$
 \begin{aligned}
