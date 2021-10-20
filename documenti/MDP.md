@@ -280,19 +280,19 @@ $$
 \frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \right) \\
 &= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} } -  e^{\theta_{a_o} } \cdot e^{\theta_{c,o} }}{(\sum_{b \in \{v\}} e^{\theta_b y})^2} \\
 &= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} }}{(\sum_{b \in \{v\}} e^{\theta_{b,o} })^2} - \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }}\cdot\frac{e^{\theta_{c,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \\
-&= \delta_{a,c} \pi(a) - \pi(a) \pi(c)
+&= \delta_{a,c} \pi(a|s) - \pi(a|s) \pi(c|s)
 \end{aligned}
 $$
 When $\theta = 0$ we have that
 $$
-\left. \frac{\partial}{\partial \theta_c} \pi(a) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
+\left. \frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
 \label{eq:derivpi}
 $$
 <!--[38:30] I termini di $Q$ pesando in modo diverso questi valori: le $Q$ più alte prendono un gradiente positivo più alto-->
 
 <!--We compute the term $\eqref{eq:derivpi}$ for each $c \in \mathcal A$, then $\theta_c = \theta_c - \alpha \frac{\delta J}{\delta \theta_c}$.-->
 
-So we have that $\theta = \theta - \alpha \nabla_\theta J$.
+So we have that $\theta = \theta - \alpha \nabla_\theta J$, where $\alpha$ is the learning rate.
 
 
 
