@@ -51,7 +51,7 @@ We define the cost of the process as the amount of time each underlying user of 
 In this MDP we have that
 
 - the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variable $x_g$ is **hidden**, while the variables $v_k$ and $\{v\}$ are **observable**, and we will sometimes write $s=(x_g, o)$ where $o = (v_k, \{v\})$ is the observation.
-  When the fault occurs the technician can be everywhere: at home if it is the middle of the night, at the company, be around, etc. So we introduce an extra "fake" substation, called substation $0$, that is the position of the technician when the fault occurs. So the **initial state** is always $s_0 = (x_g, 0, \mathcal C)$.
+  When the fault occurs the technician can be everywhere: at home if it is the middle of the night, at the company, be around, etc. So we introduce an extra "fake" substation, called substation $0$, that is the position of the technician when the fault occurs. So the **initial state** is always $s_0 = ( \, x_g, o_0= (0, \mathcal C) \, )$, thus we have $|x_g|=2N+1$ initial states, one for every possible position of the fault.
   Instead, the **terminal state** is of the form $s_t = (x_g, v_k, \varnothing)$, where we have that, if the fault is on a cable, $v_k$ will be one of the two substations at the ends of that faulty cable , so we would have two terminal states, while if the fault is in a substation, $v_k$ would be that exact substation, so the terminal state would be only one.
   So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric <!--[12:30 ???]-->
   
@@ -90,7 +90,7 @@ Not knowing the position of the fault $x_g$, we can solve this problem with two 
 
 The system is **<font color="00ADEF">deterministic</font>**, so given an admissible action $a$ we will surely perform it and end up in the state in which that action leads. We can say that there are no execution errors, and I will always do what I want to do. This means that $s' = \sigma(s,a)$. So, mathematically we have that the **<font color="00ADEF">transition probability</font>** is
 $$
-p(s' \mid s, a) = \mathbb I\big(s' = \sigma(s+ a)\big) = \delta_{s', \sigma(s+a)} = \begin{cases} 1 & \text{if } s'=\sigma(s+a) \\ 0 & \text{otherwise} \end{cases} \,,
+p(s' \mid s, a) = \mathbb I\big(s' = \sigma(s, a)\big) = \delta_{s', \sigma(s,a)} = \begin{cases} 1 & \text{if } s'=\sigma(s,a) \\ 0 & \text{otherwise} \end{cases} \,,
 $$
 where $\delta$ is the Kronecker delta and $\mathbb I$ is the characteristic function of a set.
 In our specific case, the transition probability is equal to $1$ only when, starting from state $s = (x_g, v_k, \{v\})$, the new substation $v_{k+1}$ of the next state $s' = (x_g, v_{k+1}, \{v'\})$ is equal to the action $a \in \{v\}$ that we took:
@@ -103,34 +103,50 @@ p(s' | s,a) = \begin{cases}
 $$
 
 
-It is somewhat surprising and not widely recognized that function approximation includes important aspects of partial observability. For example, if there is a state variable that is not observable, then the parameterization can be chosen such that the approximate value does not depend on that state variable. The effect is just as if the state variable were not observable. Because of this, all the results obtained for the parameterized case apply to partial observability without change. In this sense, the case of parameterized function approximation includes the case of partial observability.  [^1]
+It is somewhat surprising and not widely recognized that function approximation includes important aspects of partial observability. For example, if there is a state variable that is not observable, then the parameterization can be chosen such that the approximate value does not depend on that state variable. The effect is just as if the state variable were not observable. Because of this, all the results obtained for the parameterized case apply to partial observability without change. In this sense, the case of parameterized function approximation includes the case of partial observability. [[^1], pag 464 (486)]
 
 Since we don't know where the failure is, the **<font color="00ADEF">policy</font>** depends only on the observable states, so it doesn't know where the fault is. Let's define a parameterized policy using Boltzmann parameterization:
 $$
-\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})), \theta \Big) = \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \,.
+\pi \Big( a \;\big|\; o=(v_k, \{v\}), \theta \Big) = \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \,.
 \label{eq:parameterizedpolicy}
 $$
-where $\theta$ are the parameters for each action, so $\theta = (\theta_1, \theta_2, \ldots, \theta_N)^\top$ (where $N$ is the number of substations, so the number of possible actions), which depends on the action and on the observable variable $o$.
+where $\theta$ are the parameters for each state --- actually, the observable part $o$ --- and action, so they depend on the action $a$ and on the observable variable $o$ of the state:
+$$
+\theta = (\theta_{o,a})_{o \in O, a \in A} = \begin{pmatrix}
+\theta_{o_1, a_1} & \theta_{o_1, a_2} & \cdots & \theta_{o_1, a_N} \\
+\theta_{o_2, a_1} & \theta_{o_2, a_2} & \cdots & \theta_{o_2, a_N} \\
+\vdots            &                   &        & \vdots            \\
+\theta_{o_{|O|}, a_1} & \theta_{o_{|O|}, a_2}  & \cdots &  \theta_{o_{|O|}, a_N} \\
+\end{pmatrix}
+$$
+ (where $N$ is the number of substations, so the number of possible actions).
 
-If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states.
+The policy can not depend on the position of the failure, otherwise we would have automatically have solve the problem: the solution would be to go in the substation in which the failure is or at the ends of the cable (edge) where the fault is.
+
+If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states. <!--(Possiamo pensare al tempo come una cosa che scorre oppure si può pensarlo come una struttura degli stati vistitati/non visitati).-->
 
 This is a problem with terminal state, which occurs when we reconnect all the substations. It will always be reached, since with every action we visit a substation, and at the very least we remove it from the set of disconnected substations (instead, if we are lucky, every time we can remove half of the substations from the set of disconnected substations). So, for this specific problem it doesn't make sense to introduce a discount factor $\gamma$.
 
-Let's define $J$ as the sum of all the costs we have if we are in state $s = (x_g, v_k, \{v\})$ summed in time until the process is concluded. The steps of the process are formal steps, since in a step we pass from one substation to another, so the physical time is in the costs (as the time / cost of going from one substation to another).
-
-So we associate a *cost function* $J_\pi$ to each state $s \in \mathcal S$, that is the *accumulated cost from that state to the end of the process, following policy $\pi$*. So we have that the cost is
+Let's define $J$ as the sum of all the costs we incour ~~if we are in state $s = (x_g, v_k, \{v\})$~~ summed in time until the process is concluded. The steps of the process are formal steps, since in a step we pass from one substation to another, so the physical time is in the costs (as the time / cost of going from one substation to another). So we define
+$$
+\begin{aligned}
+J_\pi &= \mathbb E_\pi \left[ \sum_{t=0}^\infty r(s_t, a_t, s_{t+1}) \right] \\
+&= \mathbb E_\pi \left[ \sum_{k=0}^\infty d_{v_k, a} \cdot n_{k} \right] \,.
+\end{aligned}
+$$
+So we associate a *cost function* $V_\pi$ to each state $s \in \mathcal S$, that is the *accumulated cost from that state to the end of the process, following policy $\pi$*. In practice, it is the value of the state $s$:
 
 $$
 \begin{aligned}
-J_\pi (s) &= \mathbb E_\pi \left[ \sum_{t=0}^\infty r(s_t, a_t, s_{t+1}) \right] \\
+V_\pi (s) &= \mathbb E_\pi \left[ \left. \sum_{t=0}^\infty r(s_t, a_t, s_{t+1}) \;\right|\; s_0 = s \right] \\
 &= \mathbb E_\pi \left[ \left. \sum_{k=0}^\infty d_{v_k, a} \cdot n_{k} \;\right|\; s_0 = s \right] \,.
 \end{aligned}
 $$
-If we can find an optimal path in the states, we can find an optimal path in the substations, since that state contains the current substation and other information.
+If we can find an optimal path in the states, we can find an optimal path in the substations, since that state contains the current substation and other information.	
 
-*Can we find a recursive relation like in the Traveling Salesman?* Using the recursive equation of the value function $V$, since $V=J$, we have that
+*Can we find a recursive relation like in the Traveling Salesman?* Using the recursive equation of the value function $V$ we have that
 $$
-J_\pi \Big( s = (x_g, v_k, \{v\}) \Big) = \sum_{a \in \{v\}} \pi(a | s) \Big[ d_{v_k, a} \cdot n_{k} + J_\pi \Big( s' = (x_g, a, \{v'\}) \Big) \Big].
+V_\pi \Big( s = ( \, x_g, o=(v_k, \{v\}) \,) \Big) = \sum_{a \in \{v\}} \pi(a | o) \Big[ d_{v_k, a} \cdot n_{k} + V_\pi \Big( s' = (x_g, a, \{v'\}) \Big) \Big].
 $$
 Since the transition probabilities are deterministic, from each one of the two (or one) terminal states we can go back. But unlike in the Traveling Salesman, we won't solve the Bellman's equation at each step performing a $\max$ on the actions, since the policy can not depends on the whole state, but only on the observable part.
 
@@ -138,11 +154,27 @@ This is why we have to perform a continuous projection in the case of approximat
 
 ### Gradient descent in the policy space
 
-We have that the gradient formula is
+We have that
 $$
-\nabla_\theta J = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_\theta \pi(a|s) \, .
+J_\pi = \sum_s \rho_0(s) V_\pi (s)
+$$
+so we are averaging over the distribution of possible initial states. $J$ is a property of the entire episode, and it is like an average value.
+
+<!--$J$ è il cumulative discount in tutto, è il cumulative reward futuro che avremo partendo con una distribuzione iniziale di stati qualsiasi e poi seguendo la policy. Una volta che la policy è fissata e lo stato iniziale è estratto a random o deterministico, ma è uno solo, $J$ è ben definito. $J$ è una proprietà che dipende puramente da quali sono gli stati iniziali, che non dipendono dalla policy ma sono una cosa dettata dal sistema, e dalla policy. Dunque $J$ NON dipende da $s'$ e $a'$, ma ho un $\theta$ per ogni stato e per ogni azione.-->
+
+If we have a unique initial state $\bar s$, we have that $\rho_0(s) = \delta_{s,\bar s}$ and so we have that
+$$
+J_\pi = \sum_s \delta_{s,\bar s} V_\pi(s) =  V_\pi(\bar s)
+$$
+which is what happens in our problem, since we have an unique initial state $s_0=(x_g, 0, \mathcal C)$. NO we have $|x_g| = 2N+1$ possible initial states: one for every position of the fault!
+
+From the theory we have that the gradient formula is
+$$
+\nabla_{\theta_{o',a'}} J_\pi = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o) \, .
 \label{eq:gradient}
 $$
+where we have that $s = ( \, x_g, o = (v_k, \{v\}) \,)$ and the policy depends only on the observable part $o$ of the entire state $s$.
+
 To optimize $J$ we perform a gradient descend on $\theta$. The quantities $\eta$ and $Q$, given a policy $\pi$, are computed through *linear* operations (since they obey to linear equations), and are computed for all the states. They don't contain the position of the fault, then we sum over all possible positions of the fault.
 
 **Initial state:** We didn't visit any substation and we have all the possible positions of the fault.
@@ -150,21 +182,29 @@ To optimize $J$ we perform a gradient descend on $\theta$. The quantities $\eta$
 From the theory we have that
 $$
 \begin{aligned}
-Q_\pi(s,a) &= \sum_{s'} p(s' | s,a) \left(r(s,a,s') + \sum_{a'} \pi(a'|s')Q(s',a') \right) \\
+Q_\pi(s,a) &:= \sum_{s'} p(s' | s,a) \left(r(s,a,s') + V_\pi(s') \right) \\
 &= \mathbb E \left[ \left. \sum_{t=0}^\infty r(s_t,a_t,s_{t+1}) \;\right|\; s_0 = s, a_0 = a \right] \,.
 \end{aligned}
+$$
+is the **<font color="00ADEF">state-action value function</font>** or the **<font color="00ADEF">quality</font>** of the state-action pair. In particular we have that
+$$
+V_\pi( s = ( \, x_g, o = (v_k, \{v\}) \,) ) = \sum_{a} \pi(a|o) Q_\pi(s,a) \, ,
+$$
+so we have that
+$$
+Q_\pi(s,a) = \sum_{s'} p(s' | s,a) \left(r(s,a,s') + \sum_{a'} \pi(a'|o') Q_\pi(s',a') \right) \, .
 \label{eq:Qtheory}
 $$
-is the **<font color="00ADEF">state-action value function</font>** or the **<font color="00ADEF">quality</font>** of the state-action pair. Given that the state is $s = (x_g, v_k, \{v\})$, the action is $a \in \{v\}$ and the new state is $s' = \sigma(s,a) = (x_g, v_{k+1}=a, \{v'\})$, the equation of $Q$ in our case, given $\eqref{eq:transprob}$, is:
+Given that the state is $s = ( \, x_g, o = (v_k, \{v\}) \, )$, the action is $a \in \{v\}$ and the new state is $s' = \sigma(s,a) = ( \, x_g, o' = (v_{k+1}=a, \{v'\}) \, )$, the equation of $Q$ in our case, given $\eqref{eq:transprob}$, is:
 $$
 \begin{aligned}
-Q_\pi(s,a) = \left(d_{v_k, a} \cdot n_{k} + \sum_{a' \in \{v'\}} \pi \big( a' | \sigma(s,a) \big) Q \big( (\sigma(s,a), a' \big) \right) \,.
+Q_\pi(s,a) = \left(d_{v_k, a} \cdot n_{k} + \sum_{a' \in \{v'\}} \pi \big( a' | \sigma(o,a) \big) Q \big( (\sigma(s,a), a' \big) \right) \,.
 \end{aligned}
 $$
 While for the other variable we have that
 $$
 \begin{aligned}
-\eta_\pi(s') &:= \rho_0(s') + \sum_{s,a} \pi(a | s) p(s' | s, a) \eta_\pi(s)
+\eta_\pi(s') &:= \rho_0(s') + \sum_{s,a} \pi(a | o) p(s' | s, a) \eta_\pi(s)
 \end{aligned}
 \label{eq:etatheory}
 $$
@@ -172,7 +212,7 @@ is **the time spent in state $s'$ before the process dies**, where $\rho_0(s')$ 
 
 We can notice that the value of $Q$ depends on the values of $Q$ of future states, while the value of $\eta$ depends on the values of $\eta$ for previous states.
 
-In $\eqref{eq:Qtheory}$ we have that for every value of the parameters $\theta$ we know $\pi(a'|s')$, so it is a linear equation in $Q$.
+In $\eqref{eq:Qtheory}$ we have that for every value of the parameters $\theta$ we know $\pi(a'|o')$, so it is a linear equation in $Q$.
 
 We have that that states are in the order of the number of substations cubed $N^3$, since we have the position of the fault and the two substations that identify the not yet visited substations, and the actions are in the order of $N$. So $Q$ is an equation in $N^4$ variables. We solve it iteratively using value iteration (we find the fixed point).  ==Actually we can compute it in one sweep over all the possible states!==
 
@@ -180,7 +220,7 @@ We have that that states are in the order of the number of substations cubed $N^
 
 We can go from any substation to any other substation that has not already been connected. Let's suppose that our policy is simply to go randomly in one of the substations still disconnected, so $\pi$ is a uniform distribution over the disconnected substations, so it is
 $$
-\pi\Big(a \left| s = (x_g,v_k,\{v\}) \right. \Big) = \frac1{| \{ v \} |}
+\pi\Big(a \left| o = (v_k,\{v\}) \right. \Big) = \frac1{| \{ v \} |}
 \label{eq:rndpolicy}
 $$
 So since $s' = (x_g, v_{k+1}=a, \{v'\})$ we have that $Q$ becomes
@@ -196,7 +236,12 @@ $$
 
 We have that in $\eqref{eq:eta}$ the function $\rho_0(s')$ is the probability of starting in the initial state $s'$. Since we don't have any prior information of where the fault might be, $\rho_0$ doesn't depend on it, so $\rho_0$ will be uniform in $x_g$. This means that we divide by the number of possible positions of $x_g$, which is either in a substation or in a cable, so it is $N + (N+1) = 2N+1$. Instead, the first substation in which to go is always the fake substation $0$, which represents the position of the technician when the fault occurs, and the set of the disconnected substations must be equal to the set of all the substations $\mathcal C$. So $\rho_0$ must be $1$ when the current substation is $0$ and the set of the disconnected substations is equal to $\mathcal C$, and must be $0$ for every other situation. So we have that
 $$
-\rho_0 \Big(s = (x_g, v_k, \{v\}) \Big) = \frac1{2|\mathcal C| + 1} \mathbb I \big( v_k=0, \{v\} = \mathcal C \big) = \frac1{2N+1} \mathbb I \big( v_k = 0, \{v\} = \mathcal C \big) \,.
+\begin{aligned}
+\rho_0 \Big(s = ( \, x_g, o =(v_k, \{v\}) \,) \Big) &=
+\text{Pr}(x_g) \text{Pr}(o = o_0 = (0, \mathcal C)) \\
+&= \frac1{2|\mathcal C| + 1} \mathbb I \big( v_k=0, \{v\} = \mathcal C \big) \\
+&= \frac1{2N+1} \mathbb I \big( v_k = 0, \{v\} = \mathcal C \big) \,.
+\end{aligned}
 \label{eq:rho}
 $$
 Actually, according to the technicians of the company, the majority of the faults happen in the cables, usually when they are not anymore perfectly isolated (e.g. the wire's insulation breaks down) and they cause a short circuit, being connected to the ground and allowing charge to flow through it. We will try to take advantage of this information in a later moment, but for now we will suppose that every component has the same probability of being damaged.
@@ -204,8 +249,8 @@ Actually, according to the technicians of the company, the majority of the fault
 So in our case, thanks to $\eqref{eq:rho}$, $\eqref{eq:rndpolicy}$, and $\eqref{eq:transprob}$, we have that
 $$
 \begin{aligned}
-\eta_\pi\Big(s' = (x_g, v_{k+1}, \{v'\}) \Big) &:= \rho_0(s') + \sum_{s,a} \pi(a | s) p(s' | s, a) \eta_\pi(s) \\
-&= \frac1{2N+1} \mathbb I \big( v_k = 0, \{v'\} = \mathcal C \big) + \sum_{s \in \mathrm{pa}(s')} \pi(a = v_{k+1} | s) \eta_\pi(s)
+\eta_\pi\Big(s' = (x_g, v_{k+1}, \{v'\}) \Big) &:= \rho_0(s') + \sum_{s,a} \pi(a | o) p(s' | s, a) \eta_\pi(s) \\
+&= \frac1{2N+1} \mathbb I \big( v_k = 0, \{v'\} = \mathcal C \big) + \sum_{s \in \mathrm{pa}(s')} \pi(a = v_{k+1} | o) \eta_\pi(s)
  \\
 &= \frac1{2N+1} \mathbb I \big( v_k = 0, \{v'\} = \mathcal C \big) + \sum_{s \in \mathrm{pa}(s')} \frac1{|\{v\}|} \eta_\pi \Big( s = (x_g, v_{k}, \{v\}) \Big)
 \end{aligned}
@@ -215,7 +260,7 @@ where $\mathrm{pa}(s')$ indicates the parents of the node $s'$ in the dependency
 
 **Idea of the algorithm:** We start from a certain policy, for example the random policy of equation $\eqref{eq:rndpolicy}$, in which we choose randomly the substation to be visited. This means that in the parameterized policy $\eqref{eq:parameterizedpolicy}$ all the parameters $\theta$ are equal to $0$: $\theta = 0 = (0, 0, \ldots, 0)$. This is because in the random policy the parameters $\theta$ don't depend on the action $a$, so we have that
 $$
-\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) = \frac{e^{\theta_o}}{\sum_{b \in \{v\}} e^{\theta_o}} = \frac{e^{\theta_o}}{e^{\theta_o} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
+\pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) = \frac{e^{\theta_o}}{\sum_{b \in \{v\}} e^{\theta_o}} = \frac{e^{\theta_o}}{e^{\theta_o} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
 \label{eq:policy}
 $$
 This is true for every choice of $\theta$ which doesn't depend on the action, but in practice to construct a uniform policy we take $\theta = 0 = (0, 0, \ldots, 0)$. But notice that this is not the only way.
@@ -226,7 +271,7 @@ Then we compute the gradient using $\eqref{eq:gradient}$. The gradients of the p
 
 So having done these steps we have an expression for the gradient for every parameter. So we do a sweep over all the parameters and we find the value of the gradient for each one of them. Then we take a step in the parameters space and we descent the gradient. We stop when the value of $J$ doesn't change "so much" in percentage.
 
-I we have the intuition that there is a deterministic sequence of action to be performed, we have that the parameters $\theta$ tend to infinity. This is because the deterministic policies correspond to a one-hot vector in which we have $1$ for only one action and $0$ for all the other actions, and this happens when the parameter associated to this action becomes much bigger than the others, so that when we normalize it with the parametrization of the policy (which is like a softmax) it becomes $1$ while the others are so small that becomes $0$. If it is like this, the gradient descent never stops and there could be problems of overflow on $\theta$ since it goes to infinity.
+If we have the intuition that there is a deterministic sequence of action to be performed, we have that the parameters $\theta$ tend to infinity. This is because the deterministic policies correspond to a one-hot vector in which we have $1$ for only one action and $0$ for all the other actions, and this happens when the parameter associated to this action becomes much bigger than the others, so that when we normalize it with the parametrization of the policy (which is like a softmax) it becomes $1$ while the others are so small that becomes $0$. If it is like this, the gradient descent never stops and there could be problems of overflow on $\theta$ since it goes to infinity.
 
 A smart thing to do when this happens is to write the parametrization in the following way (the state $s$ is fixed):
 $$
@@ -260,32 +305,35 @@ For every position of the fault, we compute the matrix $Q$ bottom-up and the vec
 
 ### Compute the gradient
 
+We have seen in $\eqref{eq:gradient}$ that, for $s = ( \, x_g, o = (v_k, \{v\}) \, )$ and $s' = (\, x_g, o' = (v_{k+1}, \{v'\}) \,)$, we have:
 $$
-\nabla_\theta J = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_\theta \pi(a|s) \, .
+\nabla_{\theta_{o',a'}} J = \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o) \, .
 \nonumber
 $$
 
-Given that the vector $\theta$ is $\theta = (\theta_1, \theta_2, \ldots, \theta_N)^\top$, where $N$ is the number of substations, we have that
+Given that the vector $\theta$ is $\theta = (\theta_{o,a})_{o,a}$, where $N$ is the number of substations, we have that
 $$
-\nabla_\theta J = \begin{pmatrix}
-\frac{\partial}{\partial \theta_1} J \\
-\frac{\partial}{\partial \theta_2} J \\
+\nabla_{\theta_{o',a'}} J = \begin{pmatrix}
+\frac{\partial}{\partial \theta_{o_1, a_1}} J & \cdots & \frac{\partial}{\partial \theta_{o_1, a_N}} J \\
+\frac{\partial}{\partial \theta_{o_2, a_1}} J &  \cdots & \frac{\partial}{\partial \theta_{o_2, a_N}} J \\
 \vdots \\
-\frac{\partial}{\partial \theta_N} J
+\frac{\partial}{\partial \theta_{o_{|O|}, a_1}} J & \cdots & \frac{\partial}{\partial \theta_{o_{|O|}, a_N}} J
 \end{pmatrix} \, .
 $$
 Given the equation for the policy in $\eqref{eq:parameterizedpolicy}$, we have that its derivative is
 $$
 \begin{aligned}
-\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \right) \\
-&= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} } -  e^{\theta_{a_o} } \cdot e^{\theta_{c,o} }}{(\sum_{b \in \{v\}} e^{\theta_b y})^2} \\
-&= \frac{\delta_{a,c} \cdot e^{\theta_{a,o} } \cdot \sum_{b \in \{v\}} e^{\theta_{b,o} }}{(\sum_{b \in \{v\}} e^{\theta_{b,o} })^2} - \frac{e^{\theta_{a,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }}\cdot\frac{e^{\theta_{c,o} }}{\sum_{b \in \{v\}} e^{\theta_{b,o} }} \\
-&= \delta_{a,c} \pi(a|s) - \pi(a|s) \pi(c|s)
+\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
+&= \frac{\delta_{a,c} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} } -  e^{\theta_{o,a} } \cdot e^{\theta_{o, c} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b}})^2} \\
+&= \frac{\delta_{a,c} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b} })^2} - \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }}\cdot\frac{e^{\theta_{o,c} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \\
+&= \delta_{a,c} \pi(a|o) - \pi(a|o) \pi(c|o) \\
+&= \left( \delta_{a,c} - \pi(c|o) \right) \, \pi(a|o)
 \end{aligned}
+\label{eq:gradpi}
 $$
 When $\theta = 0$ we have that
 $$
-\left. \frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
+\left. \frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
 \label{eq:derivpi}
 $$
 <!--[38:30] I termini di $Q$ pesando in modo diverso questi valori: le $Q$ più alte prendono un gradiente positivo più alto-->
@@ -293,6 +341,90 @@ $$
 <!--We compute the term $\eqref{eq:derivpi}$ for each $c \in \mathcal A$, then $\theta_c = \theta_c - \alpha \frac{\delta J}{\delta \theta_c}$.-->
 
 So we have that $\theta = \theta - \alpha \nabla_\theta J$, where $\alpha$ is the learning rate.
+
+#### NEW PART
+
+Given $\eqref{eq:gradient}$, we have that, given $\eqref{eq:gradpi}$ ==[Decide formalism!]==:
+$$
+\begin{aligned}
+\frac{\partial}{\partial \theta_{o',a'}} \pi ( a | o )
+&= \frac{\partial}{\partial \theta_{o',a'}} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
+&= \delta_{o,o'}\Big( \left( \delta_{a,a'} - \pi(a'|o) \right) \, \pi(a|o) \Big)
+\end{aligned}
+$$
+since if $o \neq o'$ we have that $\theta_{o',a'}$ and $\theta_{o,a}$ are definitely different parameters.
+
+In particular
+$$
+\nabla_{\theta_{o',a'}} \pi(a|o) = \begin{pmatrix}
+\frac{\partial}{\partial \theta_{o_1,a_1}} \pi ( a | o ) & \frac{\partial}{\partial \theta_{o_1,a_2}} \pi ( a | o ) & \cdots & \frac{\partial}{\partial \theta_{o_1,a_N}} \pi ( a | o ) \\
+\vdots & & & \vdots \\
+\frac{\partial}{\partial \theta_{o_{|O|},a_1}} \pi ( a | o ) & \frac{\partial}{\partial \theta_{o_{|O|},a_2}} \pi ( a | o ) & \cdots & \frac{\partial}{\partial \theta_{o_{|O|},a_N}} \pi ( a | o ) \\
+\end{pmatrix}
+$$
+So we have that
+$$
+\begin{aligned}
+\nabla_{\theta_{o',a'}} J &= \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|s) \\
+&= \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \delta_{s,s'}\Big( \left( \delta_{a,a'} - \pi(a'|o) \right) \, \pi(a|o) \Big) \\
+&= \sum_a \eta_\pi(s') Q_\pi(s',a) \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o') \\
+&= \eta_\pi(s') \sum_a Q_\pi(s',a) \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o')\, .
+\end{aligned}
+$$
+
+#### Averaging for the position of the failure
+
+THE PROBLEM IS THAT I DON'T HAVE ACCESS TO THE POSITION OF THE FAILURE! SO I can not use $\eqref{eq:gradient}$, because I cannot compute $\eta(s)$ and $Q(s,a)$ for the real position of the failure.
+
+So I have to consider every possible position of the failure and find a way to determine a unique policy (instead of a policy for every position of the failure) that doesn't depend on the position of the fault. So I have to use $Q(o, a)$ but I can only compute $Q(s,a)$ for every possible position of the failure $x_g$, and same with $\eta$.
+
+As we already said, we have that the policy does not depend on the position of the failure, so $\pi = \pi (a | o)$, while the value $Q_\pi$ depends on it: $Q_\pi = Q_\pi(s,a)$. Since we cannot use the value of $Q$ which depend on the entire state $s$ to compute the gradient of $J$, we use an average value of $Q$ for every possible position of the failure (which can be in a substation or on a cable with uniform probability):
+$$
+\bar Q_\pi (o, a) = \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \text{Pr} (x_g)
+$$
+Since we are assuming that the failure can happen in every cable and edge with the same probability, we have that
+$$
+\begin{aligned}
+\bar Q_\pi (o, a) &= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \text{Pr} (x_g) \\
+&= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \frac1{|x_g|} \\
+&= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \frac1{2N+1} \\
+&= \frac1{2N+1} \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, .
+\end{aligned}
+$$
+<!--sommo su tutte le posizioni del guasto con una probabilità random.-->
+
+Then we have that the average value of $\eta$ is
+$$
+\bar \eta (o') = \sum_{x_g} \eta (s' = (\, x_g, o' = (v_{k+1}, \{v'\})\,))
+$$
+==In $\bar Q$ e $\bar \eta$  perché non devo dividere per $\text{Pr}(x_g)$?==
+
+
+
+#### Problem
+
+The problem is that I cannot compute 
+
+We can compute $\nabla J$ in two different ways:
+
+1. First method: compute
+   $$
+   \nabla_{\theta_{s',a'}} J = \eta_\pi(s') \sum_a Q_\pi(s',a) \nabla_{\theta_{s',a'}}  \Big( \left( \delta_{a,a'} - \pi(a'|s') \right) \, \pi(a|s') \Big)
+   $$
+   for every possible position of the failure (where $\pi(a|s')$ with $s' = (\, x_g, o'\,)$ is equal to the value of $\pi(a|o')$, so it is full of duplicates) and then compute
+   $$
+   \Delta \theta_{o', a'} = \sum_{x_g: s'=(x_g, o')} \nabla_{\theta_{s',a'}} J,
+   $$
+
+   so I sum all the states that have equal observation $o'$ (raggruppo le variazioni delle $\theta$/$\pi$ per differenti $x_g$ ma uguali $o$ → raggruppo sulla direzione che non so: $x_g$!). ==Forse devo moltiplicare anche per $\text{Pr}(x_g)$?==
+   
+2. Second method: compute
+   $$
+   \nabla_{\theta_{o',a'}} J = \bar \eta_\pi(o') \sum_a \bar Q_\pi(o',a) \nabla_{\theta_{o',a'}}  \Big( \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o') \Big)
+   $$
+   using the previous defined $\bar \eta$ and $\bar Q$.
+
+Quindi o faccio la media delle variazioni dei $\theta$ oppure faccio la media direttamente sulle variabili di $\eta$ e $Q$.
 
 
 
