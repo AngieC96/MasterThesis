@@ -13,7 +13,7 @@ We define the cost of the process as the amount of time each underlying user of 
 <table>
   <tr>
     <td>
-      <img src=".images/MDP/MDP_0.PNG" alt="Step_0">
+      <img src=".images/MDP/MDP_0.PNG">
     </td>
     <td>
       <img src=".images/MDP/MDP_1.PNG" alt="Step_1" >
@@ -43,6 +43,7 @@ We define the cost of the process as the amount of time each underlying user of 
     <p style="text-align:center;"><img src=".images/MDP/MDP_4.PNG" alt="Step_4" width="49%"></p></td></tr>
   <tr><td>Figure 5. We reconnected substations 1 and 2 (green). All the subsations are reconnected.</td></tr>
 </table>
+
 
 
 
@@ -102,8 +103,15 @@ p(s' | s,a) = \begin{cases}
 \label{eq:transprob}
 $$
 
-
 It is somewhat surprising and not widely recognized that function approximation includes important aspects of partial observability. For example, if there is a state variable that is not observable, then the parameterization can be chosen such that the approximate value does not depend on that state variable. The effect is just as if the state variable were not observable. Because of this, all the results obtained for the parameterized case apply to partial observability without change. In this sense, the case of parameterized function approximation includes the case of partial observability. [[^1], pag 464 (486)]
+
+We define the observable $o$ as a function of $s$:
+$$
+o(s): &\mathcal S &\rightarrow &\mathcal O\\
+&s = (x_g, \, o = \left( v_k, \{v\} \right) \,) &\mapsto &o = (v_k, \{v\}),
+\label{eq:o}
+$$
+which for different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only on the position of the fault $x_g$ associates the same observable $o = (v_k, \{v\})$. We have that $o$ is an equivalence class for $s$. But for brevity we will keep implicit this dependency, and most of the times we will write $o$ instead of $o(s)$, meaning that $o = o (s)$.
 
 Since we don't know where the failure is, the **<font color="00ADEF">policy</font>** depends only on the observable states, so it doesn't know where the fault is. Let's define a parameterized policy using Boltzmann parameterization:
 $$
@@ -119,8 +127,15 @@ $$
 \theta_{o_{|O|}, a_1} & \theta_{o_{|O|}, a_2}  & \cdots &  \theta_{o_{|O|}, a_N} \\
 \end{pmatrix}
 $$
-(where $N$ is the number of substations, so the number of possible actions).
-
+(where $N$ is the number of substations, so the number of possible actions). So we also have that
+$$
+\pi \Big( a \;\big|\; o=(v_k, \{v\}), \theta \Big) = \begin{pmatrix}
+\pi(a_1 | o_1) & \pi(a_2 | o_1) & \cdots & \pi(a_N | o_1) \\
+\pi(a_1 | o_2) & \pi(a_2 | o_2) & \cdots & \pi(a_N | o_2) \\
+\vdots            &                   &        & \vdots            \\
+\pi(a_1 | o_{|O|}) & \pi(a_2 | o_{|O|})  & \cdots &  \pi(a_N | o_{|O|}) \\
+\end{pmatrix} \, .
+$$
 The policy can not depend on the position of the failure, otherwise we would have automatically have solve the problem: the solution would be to go in the substation in which the failure is or at the ends of the cable (edge) where the fault is.
 
 If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states. <!--(Possiamo pensare al tempo come una cosa che scorre oppure si può pensarlo come una struttura degli stati vistitati/non visitati).-->
@@ -321,39 +336,25 @@ $$
 \frac{\partial}{\partial \theta_{o_{|O|}, a_1}} J & \cdots & \frac{\partial}{\partial \theta_{o_{|O|}, a_N}} J
 \end{pmatrix} \, .
 $$
-Given the equation for the policy in $\eqref{eq:parameterizedpolicy}$, we have that its derivative is
+Given the equation for the policy in $\eqref{eq:parameterizedpolicy}$, and given $\eqref{eq:gradient}$, we have that its derivative is
 $$
 \begin{aligned}
-\frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) &= \frac{\partial}{\partial \theta_c} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
-&= \frac{\delta_{a,c} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} } -  e^{\theta_{o,a} } \cdot e^{\theta_{o, c} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b}})^2} \\
-&= \frac{\delta_{a,c} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b} })^2} - \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }}\cdot\frac{e^{\theta_{o,c} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \\
-&= \delta_{a,c} \pi(a|o) - \pi(a|o) \pi(c|o) \\
-&= \left( \delta_{a,c} - \pi(c|o) \right) \, \pi(a|o)
+\frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) &= \frac{\partial}{\partial \theta_{o',a'}} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
+&= \delta_{o',o} \cdot \frac{\delta_{a',a} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} } -  e^{\theta_{o,a} } \cdot e^{\theta_{o, a'} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b}})^2} \\
+&= \delta_{o',o} \cdot \left( \frac{\delta_{a',a} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b} })^2} - \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }}\cdot\frac{e^{\theta_{o,a'} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
+&= \delta_{o',o} \cdot \left( \delta_{a',a} \pi(a|o) - \pi(a|o) \pi(a'|o) \right) \\
+&= \delta_{o',o} \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o)
 \end{aligned}
 \label{eq:gradpi}
 $$
-When $\theta = 0$ we have that
+since if $o \neq o'$ we have that $\theta_{o',a'}$ and $\theta_{o,a}$ are definitely different parameters. When $\theta = 0$ we have that
 $$
-\left. \frac{\partial}{\partial \theta_c} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) \right|_{\theta=0} = \frac1{|\{v\}|} \delta_{a,c} - \frac1{|\{v\}|^2}
+\left. \frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) \right|_{\theta=0} = \delta_{o',o} \left(\frac1{|\{v\}|} \delta_{a',a} - \frac1{|\{v\}|^2} \right)
 \label{eq:derivpi}
 $$
 <!--[38:30] I termini di $Q$ pesando in modo diverso questi valori: le $Q$ più alte prendono un gradiente positivo più alto-->
 
 <!--We compute the term $\eqref{eq:derivpi}$ for each $c \in \mathcal A$, then $\theta_c = \theta_c - \alpha \frac{\delta J}{\delta \theta_c}$.-->
-
-So we have that $\theta = \theta - \alpha \nabla_\theta J$, where $\alpha$ is the learning rate.
-
-#### NEW PART
-
-Given $\eqref{eq:gradient}$, we have that, given $\eqref{eq:gradpi}$ ==[Decide formalism!]==:
-$$
-\begin{aligned}
-\frac{\partial}{\partial \theta_{o',a'}} \pi ( a | o )
-&= \frac{\partial}{\partial \theta_{o',a'}} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
-&= \delta_{o,o'}\Big( \left( \delta_{a,a'} - \pi(a'|o) \right) \, \pi(a|o) \Big)
-\end{aligned}
-$$
-since if $o \neq o'$ we have that $\theta_{o',a'}$ and $\theta_{o,a}$ are definitely different parameters.
 
 In particular
 $$
@@ -373,38 +374,21 @@ $$
 \end{aligned}
 $$
 
+So we have that
+$$
+\theta = \theta - \alpha \nabla_\theta J \, ,
+$$
+where $\alpha$ is the learning rate.
+
 #### Averaging for the position of the failure
 
 THE PROBLEM IS THAT I DON'T HAVE ACCESS TO THE POSITION OF THE FAILURE! SO I can not use $\eqref{eq:gradient}$, because I cannot compute $\eta(s)$ and $Q(s,a)$ for the real position of the failure.
 
-So I have to consider every possible position of the failure and find a way to determine a unique policy (instead of a policy for every position of the failure) that doesn't depend on the position of the fault. So I have to use $Q(o, a)$ but I can only compute $Q(s,a)$ for every possible position of the failure $x_g$, and same with $\eta$.
+So I have to consider every possible position of the failure and find a way to determine a unique policy (instead of a policy for every position of the failure) that doesn't depend on the position of the fault.
 
-As we already said, we have that the policy does not depend on the position of the failure, so $\pi = \pi (a | o)$, while the value $Q_\pi$ depends on it: $Q_\pi = Q_\pi(s,a)$. Since we cannot use the value of $Q$ which depend on the entire state $s$ to compute the gradient of $J$, we use an average value of $Q$ for every possible position of the failure (which can be in a substation or on a cable with uniform probability):
-$$
-\bar Q_\pi (o, a) = \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \text{Pr} (x_g)
-$$
-Since we are assuming that the failure can happen in every cable and edge with the same probability, we have that
-$$
-\begin{aligned}
-\bar Q_\pi (o, a) &= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \text{Pr} (x_g) \\
-&= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \frac1{|x_g|} \\
-&= \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, \frac1{2N+1} \\
-&= \frac1{2N+1} \sum_{x_g} Q_\pi \Big( a \;\big|\; s = (x_g, o=(v_k, \{v\})) \Big) \, .
-\end{aligned}
-$$
-<!--sommo su tutte le posizioni del guasto con una probabilità random.-->
-
-Then we have that the average value of $\eta$ is
-$$
-\bar \eta (o') = \sum_{x_g} \eta (s' = (\, x_g, o' = (v_{k+1}, \{v'\})\,))
-$$
-==In $\bar Q$ e $\bar \eta$  perché non devo dividere per $\text{Pr}(x_g)$?==
+As we already said, we have that the policy does not depend on the position of the failure, so $\pi = \pi (a | o)$, while the value $Q_\pi$ depends on it: $Q_\pi = Q_\pi(s,a)$.
 
 
-
-#### Problem
-
-The problem is that I cannot compute 
 
 We can compute $\nabla J$ in two different ways:
 
@@ -428,6 +412,25 @@ We can compute $\nabla J$ in two different ways:
 Quindi o faccio la media delle variazioni dei $\theta$ oppure faccio la media direttamente sulle variabili di $\eta$ e $Q$.
 
 
+$$
+\frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; s = ( x_g, \, o=(v_k, \{v\}) \, )\Big) = \delta_{o',o(s)} \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o)
+$$
+
+$$
+\frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o(s) \Big) = \delta_{o',o} \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o)
+$$
+
+$$
+\begin{aligned}
+\nabla_{\theta_{o',a'}} J &= \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+&= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+&= \sum_{s} \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)}\Big( \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o) \Big) \\
+&= \sum_{s} \delta_{o',o(s)} \eta_\pi(s) \sum_a Q_\pi(s,a) \Big( \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o) \Big) \\
+&= \sum_{x_g} \eta_\pi((x_g, o')) \sum_a Q_\pi((x_g, o'),a) \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o') \, .
+\end{aligned}
+$$
+
+since $\sum_s \delta_{o', o(s)}$ is equivalent to do an average of every possible position of the fault.
 
 
 
