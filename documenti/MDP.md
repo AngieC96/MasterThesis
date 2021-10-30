@@ -50,18 +50,18 @@ We define the cost of the process as the amount of time each underlying user of 
 
 In this MDP we have that
 
-- the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variable $x_g$ is **hidden**, while the variables $v_k$ and $\{v\}$ are **observable**, and we will sometimes write $s=(x_g, o)$ where $o = (v_k, \{v\})$ is the observation.
+- the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variable $x_g$ is **hidden**, while the variables $v_k$ and $\{v\}$ are **observable**, and we will also write $s=(x_g, o)$ where $o = (v_k, \{v\})$ is the observation.
   When the fault occurs the technician can be everywhere: at home if it is the middle of the night, at the company, be around, etc. So we introduce an extra "fake" substation, called substation $0$, that is the position of the technician when the fault occurs. So the **initial state** is always $s_0 = ( \, x_g, o_0= (0, \mathcal C) \, )$, thus we have $|x_g|=2N+1$ initial states, one for every possible position of the fault.
   Instead, the **terminal state** is of the form $s_t = (x_g, v_k, \varnothing)$, where we have that, if the fault is on a cable, $v_k$ will be one of the two substations at the ends of that faulty cable , so we would have two terminal states, while if the fault is in a substation, $v_k$ would be that exact substation, so the terminal state would be only one.
   So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric <!--[12:30 ???]-->
   
 - the **<font color="00ADEF">action</font>** is the intervention we do in the specific substation we decide to visit, so $a \in \mathcal C$. Actually, since we visit only disconnected substations, we have that $a \in \{v\}$.
 
-- the **<font color="00ADEF">next state</font>** is $s' = (x_g, v_{k+1} = a, \{v'\})$, where is the set of disconnected substations after the technician operates in substation $v_{k+1}$. We have that $\{v'\} \subseteq \{v\} \backslash a$, so the set of disconnected substations decreases after each action. We are therefore positive that the process terminates.
+- the **<font color="00ADEF">next state</font>** is $s' = (x_g, v_{k+1} = a, \{v'\})$, where $\{v'\}$ is the set of disconnected substations after the technician operates in substation $v_{k+1}$. Since the technician can always at least reconnect the substation they visit, we have that $\{v'\} \subseteq \{v\} \backslash a$, so the set of disconnected substations decreases after each action. We are therefore positive that the process terminates.
 
-- the **<font color="00ADEF">reward</font>** is the *cost* of going in a certain substation (as the time *in seconds* that it takes to go there from where we are) multiplied for the number of disconnected users. Let's define as $d_{v_k, v_{k+1}}$ the time *in seconds* to go from the substation $v_k$ to the next substation $v_{k+1}$, and $n_{k}$ the number of users still disconnected <u>before</u> operating in substation $v_{k+1}$.  So if we are in state $s = (x_g, v_k, \{v\})$, we make an action $a$ and we end up in state $s' = (x_g, v_{k+1} = a, \{v'\})$, we have that the number of disconnected users is $n_{k} = \sum_{v \in \{v\}} u_v$, where $u_v$ is the number of users underneath substation $v$. So the reward depends only on the previous state $s$ and the action taken $a$, and has formula
+- the **<font color="00ADEF">reward</font>** is the **cost** of going in a certain substation (as the time *in seconds* that it takes to go there from where we are) multiplied for the number of disconnected users. Let's define as $d_{v_k, v_{k+1}}$ the time *in seconds* to go from the substation $v_k$ to the next substation $v_{k+1}$, and $n_{k}$ the number of users still disconnected <u>before</u> operating in substation $v_{k+1}$.  So if we are in state $s = (x_g, v_k, \{v\})$, we make an action $a$ and we end up in state $s' = (x_g, v_{k+1} = a, \{v'\})$, we have that the number of disconnected users is $n_{k} = \sum_{v \in \{v\}} u_v$, where $u_v$ is the number of users underneath substation $v$. So the reward depends only on the previous state $s$ and the action taken $a$, and has formula
   $$
-  r\Big( s = (x_g, v_k, \{v\}), a, s' = (x_g, v_{k+1} = a, \{v'\}) \Big) = d_{v_k, a} \cdot n_{k} = d_{v_k, a} \cdot \sum_{v \in \{v\}} u_v \,.
+  r\Big( s = (x_g, v_k, \{v\}), a, s' = (x_g, v_{k+1} = a, \{v'\}) \Big) = r(s,a) = d_{v_k, a} \cdot n_{k} = d_{v_k, a} \cdot \sum_{v \in \{v\}} u_v \,.
   $$
   For now, in the cost we will ignore the cost of discovering if the fault is left or right, which might rise the total cost significantly. This is due to a lack of data. To improve the computation of the cost, we need to  take note carefully of the operations the technicians perform when a fault occurs. This will be done with a Telegram bot (see Section ?).
 
@@ -119,7 +119,7 @@ $$
 \theta_{o_{|O|}, a_1} & \theta_{o_{|O|}, a_2}  & \cdots &  \theta_{o_{|O|}, a_N} \\
 \end{pmatrix}
 $$
- (where $N$ is the number of substations, so the number of possible actions).
+(where $N$ is the number of substations, so the number of possible actions).
 
 The policy can not depend on the position of the failure, otherwise we would have automatically have solve the problem: the solution would be to go in the substation in which the failure is or at the ends of the cable (edge) where the fault is.
 
@@ -127,14 +127,14 @@ If we search in this space of policies, this will give us a policy which doesn't
 
 This is a problem with terminal state, which occurs when we reconnect all the substations. It will always be reached, since with every action we visit a substation, and at the very least we remove it from the set of disconnected substations (instead, if we are lucky, every time we can remove half of the substations from the set of disconnected substations). So, for this specific problem it doesn't make sense to introduce a discount factor $\gamma$.
 
-Let's define $J$ as the sum of all the costs we incour ~~if we are in state $s = (x_g, v_k, \{v\})$~~ summed in time until the process is concluded. The steps of the process are formal steps, since in a step we pass from one substation to another, so the physical time is in the costs (as the time / cost of going from one substation to another). So we define
+Let's define $J$ as the sum of all the costs we incur ~~if we are in state $s = (x_g, v_k, \{v\})$~~ summed in time until the process is concluded. The steps of the process are formal steps, since in a step we pass from one substation to another, so the physical time is in the costs (as the time / cost of going from one substation to another). So we define
 $$
 \begin{aligned}
 J_\pi &= \mathbb E_\pi \left[ \sum_{t=0}^\infty r(s_t, a_t, s_{t+1}) \right] \\
 &= \mathbb E_\pi \left[ \sum_{k=0}^\infty d_{v_k, a} \cdot n_{k} \right] \,.
 \end{aligned}
 $$
-So we associate a *cost function* $V_\pi$ to each state $s \in \mathcal S$, that is the *accumulated cost from that state to the end of the process, following policy $\pi$*. In practice, it is the value of the state $s$:
+Besides, we associate a *cost function* $V_\pi$ to each state $s \in \mathcal S$, that is the *accumulated cost from that state to the end of the process, following policy $\pi$*. In practice, it is the value of the state $s$:
 
 $$
 \begin{aligned}
@@ -156,9 +156,9 @@ This is why we have to perform a continuous projection in the case of approximat
 
 We have that
 $$
-J_\pi = \sum_s \rho_0(s) V_\pi (s)
+J_\pi = \sum_s \rho_0(s) V_\pi (s) = \sum_s \rho_0(s) \sum_a \pi(a|o) Q_\pi(s,a) \, ,
 $$
-so we are averaging over the distribution of possible initial states. $J$ is a property of the entire episode, and it is like an average value.
+given $\eqref{eq:VandQ}$, so we are averaging over the distribution of possible initial states. $J$ is a property of the entire episode, and it is like an average value.
 
 <!--$J$ è il cumulative discount in tutto, è il cumulative reward futuro che avremo partendo con una distribuzione iniziale di stati qualsiasi e poi seguendo la policy. Una volta che la policy è fissata e lo stato iniziale è estratto a random o deterministico, ma è uno solo, $J$ è ben definito. $J$ è una proprietà che dipende puramente da quali sono gli stati iniziali, che non dipendono dalla policy ma sono una cosa dettata dal sistema, e dalla policy. Dunque $J$ NON dipende da $s'$ e $a'$, ma ho un $\theta$ per ogni stato e per ogni azione.-->
 
@@ -189,6 +189,7 @@ $$
 is the **<font color="00ADEF">state-action value function</font>** or the **<font color="00ADEF">quality</font>** of the state-action pair. In particular we have that
 $$
 V_\pi( s = ( \, x_g, o = (v_k, \{v\}) \,) ) = \sum_{a} \pi(a|o) Q_\pi(s,a) \, ,
+\label{eq:VandQ}
 $$
 so we have that
 $$
