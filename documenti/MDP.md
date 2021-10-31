@@ -4,44 +4,58 @@
 
 <!--In a Markov Decision Process (MDP) we have a complete a priori knowledge of the model, so we know exactly what the model of our system is and we can perfectly know what the states are and therefore at every step... we just, without even interacting with the environment, we just plan ahead what to do.-->
 
-We are given a set of disconnected substations $\mathcal C$, with cardinality $|\mathcal C| = N$ (in practice in Trieste they are always $< 20$), between two remotely controlled substations, where these last will not be included in the problem, since they are already reconnected (in grey in Figure 1.).
+We are given a set of disconnected substations $\mathcal C$, with cardinality $|\mathcal C| = N$ (in practice in Trieste they are always $< 20$), between two remotely controlled substations, where these last will not be included in the problem, since they are already reconnected (in grey in Figure 1).
 
 We define the cost of the process as the amount of time each underlying user of <!--each user underneath-->each substation remains disconnected. So we compute the cost multiplying the time of disconnection for the number of users of a substation, and we sum them. Our objective is to minimize this cost.
 
-
+<!--In Figure 1 make substation 0 yellow?????-->
 
 <table>
   <tr>
     <td>
-      <img src=".images/MDP/MDP_0.PNG">
+      <img src="images/Vector/PNG/Asset 31-1.png" alt="Step_0">
     </td>
     <td>
-      <img src=".images/MDP/MDP_1.PNG" alt="Step_1" >
+      <img src="images/Vector/PNG/Asset 32-1.png"  alt="Step_1">
     </td>
   </tr>
 <tr>
-    <td>Figure 1. The fault has just occourred. All the substations are disconnected (orange).</td>
+    <td>Figure 1. The fault has just occourred. We are in substation 0 and all the substations are disconnected (orange).</td>
     <td>Figure 2. We visit substation 4 (yellow).</td>
   </tr>
 </table>
 <table>
   <tr>
     <td>
-      <img src=".images/MDP/MDP_2.PNG" alt="Step_2">
+      <img src="images/Vector/PNG/Asset 33-1.png" alt="Step_2">
     </td>
     <td>
-      <img src=".images/MDP/MDP_3.PNG" alt="Step_3" >
+      <img src="images/Vector/PNG/Asset 34-1.png" alt="Step_3" >
     </td>
   </tr>
 <tr>
-    <td>Figure 3. We have reconnected substations 4 and 5 (green). We go in substation 3 (yellow).</td>
-    <td>Figure 4. We have riconnected substation 3 (green). We are in substation 2 (yellow).</td>
+    <td>Figure 3. We have reconnected substations 4 and 5 (green).</td>
+    <td>Figure 4. We go in substation 3 (yellow).</td>
+</tr>
+</table>
+<table>
+  <tr>
+    <td>
+      <img src="images/Vector/PNG/Asset 35-1.png" alt="Step_4">
+    </td>
+    <td>
+      <img src="images/Vector/PNG/Asset 36-1.png" alt="Step_5" >
+    </td>
+  </tr>
+<tr>
+    <td>Figure 5. We have riconnected substation 3 (green).</td>
+    <td>Figure 6. We go in substation 2 (yellow).</td>
 </tr>
 </table>
 <table>
   <tr><td>
-    <p style="text-align:center;"><img src=".images/MDP/MDP_4.PNG" alt="Step_4" width="49%"></p></td></tr>
-  <tr><td>Figure 5. We reconnected substations 1 and 2 (green). All the subsations are reconnected.</td></tr>
+    <p style="text-align:center;"><img src="images/Vector/PNG/Asset 37-1.png" alt="Step_6" width="49%"></p></td></tr>
+  <tr><td>Figure 7. We reconnected substations 1 and 2 (green). All the subsations are reconnected.</td></tr>
 </table>
 
 
@@ -56,6 +70,14 @@ In this MDP we have that
   Instead, the **terminal state** is of the form $s_t = (x_g, v_k, \varnothing)$, where we have that, if the fault is on a cable, $v_k$ will be one of the two substations at the ends of that faulty cable , so we would have two terminal states, while if the fault is in a substation, $v_k$ would be that exact substation, so the terminal state would be only one.
   So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric <!--[12:30 ???]-->
   
+- the **<font color="00ADEF">observation</font>** is $o = (v_k, \{v\})$. We define the observable $o$ as a function of $s$:
+  $$
+  o(s): &\mathcal S &\rightarrow &\mathcal O\\
+  &s = (x_g, \, o = \left( v_k, \{v\} \right) \,) &\mapsto &o = (v_k, \{v\}),
+  \label{eq:o}
+  $$
+  which for different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only on the position of the fault $x_g$ associates the same observable $o = (v_k, \{v\})$. We have that $o$ is an equivalence class for $s$. But for brevity we will keep implicit this dependency, and most of the times we will write $o$ instead of $o(s)$, meaning that $o = o (s)$.
+  
 - the **<font color="00ADEF">action</font>** is the intervention we do in the specific substation we decide to visit, so $a \in \mathcal C$. Actually, since we visit only disconnected substations, we have that $a \in \{v\}$.
 
 - the **<font color="00ADEF">next state</font>** is $s' = (x_g, v_{k+1} = a, \{v'\})$, where $\{v'\}$ is the set of disconnected substations after the technician operates in substation $v_{k+1}$. Since the technician can always at least reconnect the substation they visit, we have that $\{v'\} \subseteq \{v\} \backslash a$, so the set of disconnected substations decreases after each action. We are therefore positive that the process terminates.
@@ -63,6 +85,7 @@ In this MDP we have that
 - the **<font color="00ADEF">reward</font>** is the **cost** of going in a certain substation (as the time *in seconds* that it takes to go there from where we are) multiplied for the number of disconnected users. Let's define as $d_{v_k, v_{k+1}}$ the time *in seconds* to go from the substation $v_k$ to the next substation $v_{k+1}$, and $n_{k}$ the number of users still disconnected <u>before</u> operating in substation $v_{k+1}$.  So if we are in state $s = (x_g, v_k, \{v\})$, we make an action $a$ and we end up in state $s' = (x_g, v_{k+1} = a, \{v'\})$, we have that the number of disconnected users is $n_{k} = \sum_{v \in \{v\}} u_v$, where $u_v$ is the number of users underneath substation $v$. So the reward depends only on the previous state $s$ and the action taken $a$, and has formula
   $$
   r\Big( s = (x_g, v_k, \{v\}), a, s' = (x_g, v_{k+1} = a, \{v'\}) \Big) = r(s,a) = d_{v_k, a} \cdot n_{k} = d_{v_k, a} \cdot \sum_{v \in \{v\}} u_v \,.
+  \label{eq:r}
   $$
   For now, in the cost we will ignore the cost of discovering if the fault is left or right, which might rise the total cost significantly. This is due to a lack of data. To improve the computation of the cost, we need to  take note carefully of the operations the technicians perform when a fault occurs. This will be done with a Telegram bot (see Section ?).
 
@@ -104,14 +127,6 @@ p(s' | s,a) = \begin{cases}
 $$
 
 It is somewhat surprising and not widely recognized that function approximation includes important aspects of partial observability. For example, if there is a state variable that is not observable, then the parameterization can be chosen such that the approximate value does not depend on that state variable. The effect is just as if the state variable were not observable. Because of this, all the results obtained for the parameterized case apply to partial observability without change. In this sense, the case of parameterized function approximation includes the case of partial observability. [[^1], pag 464 (486)]
-
-We define the observable $o$ as a function of $s$:
-$$
-o(s): &\mathcal S &\rightarrow &\mathcal O\\
-&s = (x_g, \, o = \left( v_k, \{v\} \right) \,) &\mapsto &o = (v_k, \{v\}),
-\label{eq:o}
-$$
-which for different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only on the position of the fault $x_g$ associates the same observable $o = (v_k, \{v\})$. We have that $o$ is an equivalence class for $s$. But for brevity we will keep implicit this dependency, and most of the times we will write $o$ instead of $o(s)$, meaning that $o = o (s)$.
 
 Since we don't know where the failure is, the **<font color="00ADEF">policy</font>** depends only on the observable states, so it doesn't know where the fault is. Let's define a parameterized policy using Boltzmann parameterization:
 $$
@@ -274,6 +289,22 @@ $$
 $$
 where $\mathrm{pa}(s')$ indicates the parents of the node $s'$ in the dependency graph (probabilistic graphical model - Bayesian Network).
 
+In an episodic task, the on-policy distribution is a little different in that it depends on how the initial states of episodes are chosen. Let $\rho_0(s)$ denote the **probability that an episode begins in each state $s$**, and let $\eta(s)$ denote **the number of time steps spent, on average, in state $s$ in a single episode**. Time is spent in a state $s$ if episodes start in $s$, or if transitions are made into $s$ from a preceding state $\bar s$ in which time is spent:
+$$
+\eta(s) = \rho_0(s) + \sum_{\bar s} \eta(\bar s) \sum_a \pi (a | \bar s) p(s | \bar s, a), \; \text{for all } s \in \mathcal S \, .
+\label{eq:eta-theroy}
+$$
+This system of equations can be solved for the expected number of visits $\eta (s)$.
+The **<font color="00ADEF">on-policy distribution</font>** is then the fraction of time spent in each state normalized to sum to one:
+$$
+\mu(s) = \frac{\eta(s)}{\sum_{s'} \eta(s')}, \; \text{for all } s \in \mathcal S \, .
+$$
+This is the natural choice without discounting. If there is discounting ($\gamma < 1$) it should be treated as a form of termination, which can be done simply by including a factor of $\gamma$ in the second term of $\eqref{eq:eta-theroy}$. ([^1] pag. 199 (221))
+
+
+
+
+
 **Idea of the algorithm:** We start from a certain policy, for example the random policy of equation $\eqref{eq:rndpolicy}$, in which we choose randomly the substation to be visited. This means that in the parameterized policy $\eqref{eq:parameterizedpolicy}$ all the parameters $\theta$ are equal to $0$: $\theta = 0 = (0, 0, \ldots, 0)$. This is because in the random policy the parameters $\theta$ don't depend on the action $a$, so we have that
 $$
 \pi \Big( a \;\big|\; o=(v_k, \{v\}) \Big) = \frac{e^{\theta_o}}{\sum_{b \in \{v\}} e^{\theta_o}} = \frac{e^{\theta_o}}{e^{\theta_o} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, .
@@ -378,7 +409,7 @@ So we have that
 $$
 \theta = \theta - \alpha \nabla_\theta J \, ,
 $$
-where $\alpha$ is the learning rate.
+where $\alpha$ is a  step-size parameter, or learning rate.
 
 #### Averaging for the position of the failure
 
