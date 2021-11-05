@@ -12,15 +12,21 @@
 %                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[a4paper,11pt,twoside]{book}
+
+\documentclass[a4paper,12pt,twoside]{book}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Basic class definitions, typesetting, bibliography      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\usepackage[T1]{fontenc}   % Changes the font
-\usepackage[utf8]{inputenc}
+\usepackage{iftex}
+\ifxetex
+    \usepackage{fontspec}
+\else
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+\fi
 \usepackage[italian,english]{babel}
-\usepackage{natbib}
+\usepackage{csquotes}
 
 \usepackage{lipsum}
 
@@ -61,11 +67,95 @@
 {20pt}
 {\Huge}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TOC                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{tocbibind} % \usepackage[nottoc]{tocbibind}
+\setcounter{tocdepth}{2}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Index | To be loaded before hyperref                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{imakeidx}
+%\usepackage[columns=2]{idxlayout} % , font=small
+\makeindex[intoc]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Hyperref configuration                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[%hypertex,
+    unicode           = true,
+    plainpages        = false, 
+    pdfpagelabels     = true, 
+    bookmarks         = true,
+    bookmarksnumbered = true,
+    bookmarksopen     = true,
+    breaklinks        = true,
+    backref           = false,
+    colorlinks        = true,
+    linkcolor         = black,
+    urlcolor          = black,
+    citecolor         = black,
+    anchorcolor       = black,
+    hyperindex        = true,
+    linktocpage       = true,
+    hyperfigures      = true
+]{hyperref}
+\hypersetup{
+    linkcolor         = blue,
+    urlcolor          = blue,
+    citecolor         = blue,
+    anchorcolor       = blue,
+    pdftitle={Optimizing fault search in power grid outages through Reinforcement Learning},
+    pdfauthor={Angela Carraro}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Glossary and acronyms | To be loaded after hyperref     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \let\printglossary\relax
+% \let\theglossary\relax
+% \let\endtheglossary\relax
+\usepackage[noredefwarn,acronym,toc]{glossaries}
+\makeglossaries
+\include{frontmatter/acronyms}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{natbib}
+\usepackage[%
+%    natbib                    , % provides natbib aliases
+    backend      = biber        ,
+    backref      = true         ,
+    style        = numeric-comp , %alphabetic or numeric
+    refsegment   = chapter      ,
+    defernumbers = true         ,
+    sorting      = none           %ynt
+]{biblatex}
+\addbibresource{references.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Metadata                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\THauthor{Angela Carraro}
+\def\THsupervisor{Antonio Celani, ICTP}%,\\UniTN}
+\def\THcosupervisor{Andrea Zancola, AcegasApsAmga}
+\def\THextracosupervisor{Luca Bortolussi, UniTS}
+\def\THtitle{Optimizing fault search in power grid outages through Reinforcement Learning}
+\def\THdate{\monthyear\today}
+\def\THplace{Trieste}
+\title{\THtitle}
+\author{\THauthor}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Actual text                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\setlength{\parindent}{4em}
+%\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1.1}
+
 \begin{document}
 
 \frontmatter
@@ -77,6 +167,9 @@
 % Table of contents
 \tableofcontents
 
+% Acronyms (list of abbreviations)
+\printglossary[type=\acronymtype]
+
 
 \mainmatter
 
@@ -84,30 +177,38 @@
 \include{chapters/1_introduction}
 
 
-\part{Data Management}
+%\part{Data Management}
 
 \include{chapters/2_chapter2}
 
-\include{chapters/3_chapter3}
+%\include{chapters/3_chapter3}
 
 
-\part{Algorithms}
+%\part{Reinforcement Learning} %{Algorithms}
 
 \include{chapters/4_chapter4}
 
 \include{chapters/5_chapter5}
 
+%\include{chapters/6_chapter6}
 
-\part{Finance}
 
-\include{chapters/6_chapter6}
+%\part{Finance}
+
+%\include{chapters/7_chapter7}
 
 %\backmatter
 
-\include{chapters/7_conclusion}
+\include{chapters/8_conclusion}
 
 
+% Full bibliography
+%\bibliographystyle{plain}
+%\bibliography{references}
+\printbibliography[heading=bibintoc]%[resetnumbers=true]%[notcategory=publist]
 
-\bibliographystyle{plain}
-\bibliography{references}
+
+% Index
+\printindex
+
 \end{document}
