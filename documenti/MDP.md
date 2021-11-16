@@ -55,8 +55,9 @@ We define the cost of the process as the amount of time each underlying user of 
 <table>
   <tr><td>
     <p style="text-align:center;"><img src="images/Vector/PNG/Asset 37-1.png" alt="Step_6" width="49%"></p></td></tr>
-  <tr><td>Figure 7. We reconnected substations 1 and 2 (green). All the subsations are reconnected.</td></tr>
+  <tr><td>Figure 7. We reconnected substations 1 and 2 (green). All the substations are reconnected.</td></tr>
 </table>
+
 
 
 
@@ -68,7 +69,7 @@ In this MDP we have that
 - the __<font color="00ADEF">state</font>__ is $s = (x_g, v_k, \{v\})$, where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of the still disconnected substations after the technician operates in the current substation $v_k$. We could also use the substation already reconnected, since they are complementary: given one of the two sets we can always retrieve the other. We have that the variable $x_g$ is **hidden**, while the variables $v_k$ and $\{v\}$ are **observable**, and we will also write $s=(x_g, o)$ where $o = (v_k, \{v\})$ is the observation.
   When the fault occurs the technician can be everywhere: at home if it is the middle of the night, at the company, be around, etc. So we introduce an extra "fake" substation, called substation $0$, that is the position of the technician when the fault occurs. So the **initial state** is always $s_0 = ( \, x_g, o_0= (0, \mathcal C) \, )$, thus we have $|x_g|=2N+1$ initial states, one for every possible position of the fault.
   Instead, the **terminal state** is of the form $s_t = (x_g, v_k, \varnothing)$, where we have that, if the fault is on a cable, $v_k$ will be one of the two substations at the ends of that faulty cable , so we would have two terminal states, while if the fault is in a substation, $v_k$ would be that exact substation, so the terminal state would be only one.
-  So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric <!--[12:30 ???]-->
+  So there is an initial cost which has a random component which depends on the position of the technician when the fault occurs. But what is important in our problem, based on how we are dealing with it, is the average cost, so we can think of doing an average with respect to all the possible distributions of the position of the technician, and this gives me a first average cost, which is the idea of the substation $0$. The substation $0$ represents the average position of the technician, so the associated cost to go to one random substation from this position. This is a rather brutal approximation of what happens in reality, but to make it more detailed we should introduce a spatial structure of the problem besides the graph representation..... Giving different costs to go from the substation $0$ to ever other substation introduces a kind of metric in a fake space <!--[12:30 ???]-->
   
 - the **<font color="00ADEF">observation</font>** is $o = (v_k, \{v\})$. We define the observable $o$ as a function of $s$:
   $$
@@ -139,7 +140,7 @@ $$
 $$
 where $\theta$ are the parameters for each state --- actually, the observable part $o$ --- and action, so they depend on the action $a$ and on the observable variable $o$ of the state:
 $$
-\theta = (\theta_{o,a})_{o \in O, a \in A} = \begin{pmatrix}
+\theta = (\theta_{o,a})_{o \in \mathcal O, a \in \mathcal A} = \begin{pmatrix}
 \theta_{o_1, a_1} & \theta_{o_1, a_2} & \cdots & \theta_{o_1, a_N} \\
 \theta_{o_2, a_1} & \theta_{o_2, a_2} & \cdots & \theta_{o_2, a_N} \\
 \vdots            &                   &        & \vdots            \\
@@ -155,11 +156,11 @@ $$
 \pi(a_1 | o_{|O|}) & \pi(a_2 | o_{|O|})  & \cdots &  \pi(a_N | o_{|O|}) \\
 \end{pmatrix} \, .
 $$
-The policy can not depend on the position of the failure, otherwise we would have automatically have solve the problem: the solution would be to go in the substation in which the failure is or at the ends of the cable (edge) where the fault is.
+The policy can not depend on the position of the failure, otherwise we would automatically have solved the problem: the solution would be to go in the substation in which the failure is or at the ends of the cable (edge) where the fault is.
 
 If we search in this space of policies, this will give us a policy which doesn't depend on the time, since with any algorithm we try to find the optimal parameters to solve this problem. This gives us a **stationary policy**. The structure of the states is already a measure of time, since we have the number of steps already done: the substations we already visited. So the important is not to establish a policy at the different steps, but a policy with respect to the states. <!--(Possiamo pensare al tempo come una cosa che scorre oppure si può pensarlo come una struttura degli stati vistitati/non visitati).-->
 
-This is a problem with terminal state, which occurs when we reconnect all the substations. It will always be reached, since with every action we visit a substation, and at the very least we remove it from the set of disconnected substations (instead, if we are lucky, every time we can remove half of the substations from the set of disconnected substations). So, for this specific problem it doesn't make sense to introduce a discount factor $\gamma$.
+This is a problem with terminal state, which occurs when we reconnect all the substations. It will always be reached, since with every action we visit a substation, and at the very least we remove it from the set of disconnected substations (instead, if we are lucky, every time we can remove half of the substations from the set of disconnected substations). So, for this specific problem, it doesn't make sense to introduce a discount factor $\gamma$.
 
 Let's define $J$ as the sum of all the costs we incur ~~if we are in state $s = (x_g, v_k, \{v\})$~~ summed in time until the process is concluded. The steps of the process are formal steps, since in a step we pass from one substation to another, so the physical time is in the costs (as the time / cost of going from one substation to another). So we define
 $$
@@ -261,7 +262,7 @@ $$
 So since $s' = (x_g, v_{k+1}=a, \{v'\})$ we have that $Q$ becomes
 $$
 \begin{aligned}
-Q_\pi\Big( s = (x_g,v_k,\{v\}), a \Big) &= d_{v_k, a} \cdot n_{k+1} + \sum_{a' \in \{v'\}}  \frac1{|\{v'\}|} Q \Big( \sigma(s,a), a' \Big)
+Q_\pi\Big( s = (x_g,v_k,\{v\}), a \Big) &= d_{v_k, a} \cdot n_{k} + \sum_{a' \in \{v'\}}  \frac1{|\{v'\}|} Q \Big( \sigma(s,a), a' \Big)
 \end{aligned}
 \label{eq:Q}
 $$
@@ -273,7 +274,7 @@ We have that in $\eqref{eq:eta}$ the function $\rho_0(s')$ is the probability of
 $$
 \begin{aligned}
 \rho_0 \Big(s = ( \, x_g, o =(v_k, \{v\}) \,) \Big) &=
-\text{Pr}(x_g) \text{Pr}(o = o_0 = (0, \mathcal C)) \\
+\text{Pr}(x_g) \mathbb I(o = o_0 = (0, \mathcal C)) \\
 &= \frac1{2|\mathcal C| + 1} \mathbb I \big( v_k=0, \{v\} = \mathcal C \big) \\
 &= \frac1{2N+1} \mathbb I \big( v_k = 0, \{v\} = \mathcal C \big) \,.
 \end{aligned}
@@ -457,9 +458,9 @@ $$
 
 $$
 \begin{aligned}
-\nabla_{\theta_{o',a'}} J &= \sum_{s,a} \eta_\pi(s) Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+\nabla_{\theta_{o',a'}} J
 &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
-&= \sum_{s} \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)}\Big( \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o) \Big) \\
+&= \sum_{s} \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)}\Big( \left( \delta_{a',a} - \pi(a'|o(s)) \right) \, \pi(a|o(s)) \Big) \\
 &= \sum_{s} \delta_{o',o(s)} \eta_\pi(s) \sum_a Q_\pi(s,a) \Big( \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o) \Big) \\
 &= \sum_{x_g} \eta_\pi((x_g, o')) \sum_a Q_\pi((x_g, o'),a) \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o') \, .
 \end{aligned}
