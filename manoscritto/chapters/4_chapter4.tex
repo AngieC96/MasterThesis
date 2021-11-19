@@ -1,12 +1,13 @@
 \chapter{Reinforcement Learning} % {Theoretical foundations}
+\label{chap:RL}
+
 
 \section{Introduction}
 
-%See abstarct of paper ``perez-guerrero2008''
 
 As described in \cite{SuttonBarto}, Reinforcement Learning (\acrshort{rl}) is a paradigm of Machine Learning (\acrshort{ml}), along with others, like supervised learning and unsupervised learning. It analyzes how it is possible to learn the best course of action in an environment based on maximizing some given numerical reward. The learner is not told which actions to take, but learns empirically which are the ones that lead to a bigger reward. It is also possible that the current action influences not only the immediate reward, but also the next status of the environment, and, through that, all the other rewards to come. In this case, we speak of delayed reward, which, together with trial-and-error search, form the two distinctive features of \acrshort{rl}.
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.9\textwidth]{chapters/figures/MDP-diagram.png}
     \caption{The agent-environment interaction \cite{SuttonBarto}}
@@ -14,6 +15,7 @@ As described in \cite{SuttonBarto}, Reinforcement Learning (\acrshort{rl}) is a 
 \end{figure}
 
 In an \acrshort{rl} problem we have a learning \emph{agent}\index{agent}, the decision-maker, that interacts over time with the \emph{environment}\index{environment} in which it is placed --- which includes everything outside the agent --- in order to achieve a \emph{goal}\index{goal}, which is to maximize the total reward it receives over the long run. As we see in \autoref{fig:MDP}, the agent can sense aspects of its environment through the \emph{states}\index{state} --- which can also be seen as a representation of the environment itself, it can choose \emph{actions}\index{action} to influence the environment, and it receives a \emph{reward}\index{reward} based on the outcome of its actions. We consider to be a reinforcement learning method any method that is well suited to solving problems framed in this way. Other elements of the \acrshort{rl} system are a \emph{policy}, a \emph{value function}, and a \emph{model} of the environment. A \emph{policy}\index{policy} describes the behavior of the agent at a given time, using a mapping from states to actions to be taken in those states. A \emph{value function}\index{value function} determines the value of a state as the total amount of reward an agent can expect to accumulate over the future, starting from that state. Instead, a \emph{model} of the environment\index{model of the environment} reproduces the behavior of the latter, and it is used for planning actions before actually experiencing them. For example, given to the model a state and action, it might predict with a certain probability the resultant next state and next reward.
+
 
 \section{Finite Markov Decision Processes}
 
@@ -40,7 +42,7 @@ One could compute also the \emph{transition probabilities}\index{transition prob
     p(s'|s, a) := \text{Pr}\{S_t = s' \mid S_{t-1} = s, A_{t-1} = a\} = \sum_{r \in \mathcal R} p(s', r \mid s, a) \, .
 \end{equation}
 
-The expected rewards for state--action--next-action triples can be computed as $r: \mathcal S \times \mathcal A \times \mathcal S \to R$,
+The \emph{expected rewards}\index{expected reward} for state--action--next-action triples can be computed as $r: \mathcal S \times \mathcal A \times \mathcal S \to R$,
 \begin{equation}
     r(s, a, s') := \mathbb E \left[ R_t | S_{t-1} = s, A_{t-1} = a, S_t = s' \right] = \sum_{r \in \mathcal R} r \cdot p(s', r | s, a) \, .
 \end{equation}
@@ -73,7 +75,7 @@ To reach its goal, the agent must estimate how good it is to be in a given state
 \end{equation}
 which is the expected return when starting in state $s$ and following policy $\pi$ thereafter. If there exists a terminal state\index{terminal state}, which causes the process to terminate if reached, its value is always zero.
 
-Similarly, the value of taking action $a$ in state $s$ under policy $\pi$ is stored in the \emph{action-value function}\index{action-value function}, or \emph{quality}\index{quality|see {action-value function}}, which is expressed with
+Similarly, the value of taking action $a$ in state $s$ under policy $\pi$ is stored in the \emph{(state-)action value function}\index{action value function}\index{state-action value function|see {action value function}}, or \emph{quality}\index{quality|see {action value function}}, which is expressed with
 \begin{equation}
     \begin{aligned}
         Q_\pi(s,a)
@@ -116,7 +118,7 @@ The presentation of this topic will mainly follow the one in \cite{Spaan12pomdp}
 
 What happens if the agent does not know anymore with full certainty the state of the environment, maybe due to imperfections or limitations in the agent's sensors, or to errors in the interpretation of the environment, or simply to unknown aspects of the environment itself?
 
-If some features of the state are hidden from the agent, and the latter can sense only a part of the real state of the environment, the resultant state signal will no longer be Markovian, breaking a key assumption of most \acrshort{rl} methods, like the \acrshort{mdp} formulation. Luckily, we can consider an extension of the (fully observable) \acrshort{mdp} framework, that can deal with the uncertainty originated from the imperfect states perceived by the agent or the uncertain action effects.
+If some features of the state are hidden from the agent, and the latter can sense only a part of the real state of the environment, the resultant state signal will no longer be Markovian, breaking a key assumption of most \acrshort{rl} methods, like the \acrshort{mdp} formulation. Luckily, we can consider an extension of the (fully observable) \acrshort{mdp} framework, that can deal with the uncertainty originating from the imperfect states perceived by the agent or the uncertain action effects.
 
 A \emph{partially observable Markov decision process}\index{partially observable Markov decision process}, or \acrshort{pomdp}, is a framework that considers environments that are only partially observable to the agent, but allows anyway for optimal decision-making \cite{Kaelbling1998}, contrary to the requirement of full knowledge of the environment of \acrshort{mdp}s.
 
@@ -148,14 +150,15 @@ using the notation of \cite{Poupart2010}.
 
 Thus, a \acrshort{pomdp} can be described as the tuple $(\mathcal S, \mathcal A, p, r, \mathcal O, z)$, where $r = r(s,a,s')$ is the expected immediate reward, as in an \acrshort{mdp} \cite{Kaelbling1998}.
 
-The goal of the agent is, once again, to find the optimal policy $\pi$ that maximizes the expected return\index{expected return} in \eqref{eq:goal-average}. To solve both \acrshort{mdp}a and \acrshort{pomdp}s, one can use several different methods, which are classified according to the dimensions of the state and action spaces as well as based on whether the model of the environment is available or not. In fact, there are \emph{tabular methods}\index{tabular methods} --- which are exact and use arrays to store value functions, or \emph{approximate solution methods}\index{approximate solution methods} --- which employ function approximators, using limited computational resources; then there are \emph{model-based methods}\index{model-based methods} --- which make use of the known model of the environment and of planning to find the exact optimal policy, or \emph{model-free methods}\index{model-free methods} --- which are trial-and-error learner.
+The goal of the agent is, once again, to find the optimal policy $\pi$ that maximizes the expected return\index{expected return} in \eqref{eq:goal-average}. To solve both \acrshort{mdp}a and \acrshort{pomdp}s, one can use several different methods, which are classified according to the dimensions of the state and action spaces, as well as based on whether the model of the environment is available or not. In fact, there are \emph{tabular methods}\index{tabular methods} --- which are exact and use arrays to store value functions, or \emph{approximate solution methods}\index{approximate solution methods} --- which employ function approximators, using limited computational resources; then there are \emph{model-based methods}\index{model-based methods} --- which make use of the known model of the environment and of planning to find the exact optimal policy, or \emph{model-free methods}\index{model-free methods} --- which are trial-and-error learner.
 
 Often finding an exact optimal policy for \acrshort{pomdp}s can be computationally very expensive, so even for relatively small problems it is required to use approximate methods \cite{Aberdeen2002ScalingIP}. They are divided into two main classes: \emph{value-function methods}\index{value-function methods} --- or \emph{action-value methods}\index{action-value methods|see {value-function methods}} as in \cite{SuttonBarto}, that attempt to learn an approximate value function of the belief\index{belief} states (which are probability distributions over the states); and \emph{policy-based methods}\index{policy-based methods}, that search for a good policy within a fixed class of parameterized policies. We will focus on the second ones, since it is what we will implement to solve our problem.
 
 
 \section{Policy gradient methods}
+\label{sec:pgm}
 
-A \emph{policy gradient method}\index{policy gradient method} attempts to optimize the parameters of a parametrized policy using either gradient ascent or gradient descent in the parameters' space, based on the expression of the agent's goal. In fact, it tries to maximize (or minimize) the expected return of a policy inside the policy class dictated by the parametrization. This method then uses directly the policy to choose the actions, instead of consulting a value function, which however might still be used to learn the parameters.
+A \emph{policy gradient method}\index{policy gradient method} is a policy-based method that attempts to optimize the parameters of a parametrized policy using either \emph{gradient  ascent}\index{gradient ascent} or \emph{gradient descent}\index{gradient descent} in the parameters' space, based on the expression of the agent's goal. In fact, it tries to maximize (or minimize) the expected return of a policy inside the policy class dictated by the parametrization. This method then uses directly the policy to choose the actions, instead of consulting a value function, which however might still be used to learn the parameters.
 
 Policy gradient methods present some perks that make them highly valuable: the parametrized policy allows for direct incorporation of potential environment insights, they can naturally switch from the discrete setting to the continuous one, and they converge to at least a locally optimal policy, even if, as a drawback, the convergence can be very slow and finding the global optimum instead of a local one can be hard \cite{Peters2010}. Another distinctive trait of these methods is that they can also naturally handle partial state information. In fact, if a state variable can not be observed, then we can choose the policy parametrization such that the parameters do not depend on that state variable. Thus, we can directly apply these methods to \acrshort{pomdp}s, without having to make any changes.
 
@@ -175,24 +178,30 @@ while for continuous problems it is used the Gaussian distribution
 \end{equation}
 where $\boldsymbol \theta_2$ is an exploration parameter, and $\phi(s,a) \in \mathbb R^{d'}$ is a feature vector characterizing state $s$ and action $a$ \cite{Sutton2000}.
 
-To learn the policy parameters $\boldsymbol \theta$ we will use the  gradient of some scalar \emph{performance measure}\index{performance measure} $J(\boldsymbol \theta)$ --- which can also be directly the expected return --- with respect to the policy parameters. If the performance $J(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J(\boldsymbol \theta)$:
+To learn the policy parameters $\boldsymbol \theta$ we will use the  gradient of some scalar \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ --- which can also be directly the expected return --- with respect to the policy parameters. If the performance $J_\pi(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J_\pi(\boldsymbol \theta)$:
 \begin{equation}
-    \boldsymbol \theta_{t+1} = \boldsymbol \theta_t + \alpha \widehat{\nabla J(\boldsymbol \theta_t)} \, ;
+    \boldsymbol \theta_{k+1} = \boldsymbol \theta_k + \alpha \nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta_k) \, ;
     \label{eq:grad-ascent}
 \end{equation}
 instead, if the performance measures the costs that the agent encounters, we seek to minimize it, so we use approximate gradient \textit{descent} in $J(\boldsymbol \theta)$:
 \begin{equation}
-    \boldsymbol \theta_{t+1} = \boldsymbol \theta_t - \alpha \widehat{\nabla J(\boldsymbol \theta_t)} \, ;
+    \boldsymbol \theta_{k+1} = \boldsymbol \theta_k - \alpha \nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta_k) \, ;
     \label{eq:grad-descent}
 \end{equation}
 where, in both cases, $\alpha > 0$ is a \emph{step-size parameter}\index{step-size parameter|see {learning rate}} or the \emph{learning rate}\index{learning rate}.
 
-As done before, we will treat the episodic case, for which we define the \emph{performance measure}\index{performance measure} $J(\boldsymbol \theta)$ as the average value of the starting states of the process:
+As done before, we will treat the episodic case, for which we define the \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ as the average value of the initial states\index{initial state} of the process:
 \begin{equation}
-    J_\pi (\boldsymbol \theta) = \sum_s \rho_s(s) V_{\pi_{\boldsymbol \theta}}(s) \, .
+    \begin{aligned}
+        J_\pi (\boldsymbol \theta) 
+        &= \sum_s \rho_0(s) V_{\pi_{\boldsymbol \theta}}(s) \\
+        &= \sum_s \rho_0(s) \sum_a \pi(a|s) Q_{\pi_{\boldsymbol \theta}}(s, a) \, .
+    \end{aligned}
+    \label{eq:J}
 \end{equation}
+where we define as $\rho_0(s')$ the probability that an episode begins in state $s' \in \mathcal S$.
 
-We define as $\rho_0(s')$ the probability that an episode begins in state $s' \in \mathcal S$, and then we define $\eta_\pi(s')$ as the average number of time steps that the agent spends in state $s'$ before the process dies. Time is spent in a state $s'$ if episodes start in that state $s'$, or if the environment transitions into $s'$ from a previous state $s$ in which time is spent. Thus, we have that the formula for $\eta_\pi$ is
+Let us define $\eta_\pi(s')$ as the average number of time steps that the agent spends in state $s'$ before the process dies. Time is spent in a state $s'$ if episodes start in that state $s'$, or if the environment transitions into $s'$ from a previous state $s$ in which time is spent. Thus, we have that the formula for $\eta_\pi$ is
 \begin{equation}
     \eta_\pi(s') = \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a|s) p(s'|s, a), \; \text{for all } s' \in \mathcal S.
     \label{eq:eta}
@@ -209,10 +218,10 @@ See \cite{SuttonBarto} for the demonstration in the episodic case, which involve
 Thus, solving the expression for \eqref{eq:gradJ} and using it in equations \eqref{eq:grad-ascent} -- \eqref{eq:grad-descent} allows optimizing the parameters of the policy, building an optimal policy in the chosen parametrization class. Note that to find both $\eta_\pi$ and $Q_\pi$ we need to solve two linear systems, \eqref{eq:Q-recursive} and \eqref{eq:eta}, and, moreover, they depend on the policy $\pi$, thus they must be solved at every iteration.
 
 
-\subsection{Natural policy gradient}
+%\subsection{Natural policy gradient}
 
-See Natural actor critic, Peters, Vijayakumar, Schaal, European Conference on Machine Learning (2005).
+% See Natural actor critic, Peters, Vijayakumar, Schaal, European Conference on Machine Learning (2005).
 
-See (Hennes, Neural Replicator Dynamics: Multiagent Learning via Hedging Policy Gradients) \href{https://arxiv.org/pdf/1906.00190.pdf}{here} (page 8, appendix A4) for proof of natural gradient.
+% See (Hennes, Neural Replicator Dynamics: Multiagent Learning via Hedging Policy Gradients) \href{https://arxiv.org/pdf/1906.00190.pdf}{here} (page 8, appendix A4) for proof of natural gradient.
 
-Amari, S. I. (1998). Natural gradient works efficiently in learning. Neural Computation, 10(2):251–276.
+% Amari, S. I. (1998). Natural gradient works efficiently in learning. Neural Computation, 10(2):251–276.

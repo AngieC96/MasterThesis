@@ -28,6 +28,26 @@
 \usepackage[italian,english]{babel}
 \usepackage{csquotes}
 
+%%% Change headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt} % Removes the line in the header
+\cfoot{-- \thepage \hspace{1pt} --} % Sets page numbering at the bottom centered
+\fancyhead[LO]{\textsl{\rightmark}} % To put headers like in 'headings'
+\fancyhead[RE]{\textsl{\leftmark}}
+\setlength{\footskip}{60pt}
+\setlength{\headheight}{14.5pt} % To remove warning
+
+\fancypagestyle{plain}{ % To change the page numberiny style also in the fist page of the chapters, since it switches to the palin style
+  \fancyhf{}
+  \cfoot{-- \thepage \hspace{1pt} --}
+}
+
+%\setlength{\parindent}{4em}
+%\setlength{\parskip}{1em}
+\renewcommand{\baselinestretch}{1.3}
+
 \usepackage{lipsum}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -36,6 +56,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
+\mathchardef\mhyphen="2D % dash in math mode
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Graphics                                                %
@@ -44,6 +65,15 @@
 \usepackage{graphicx}
 \usepackage{geometry}
 \usepackage{tikz}
+\usepackage[export]{adjustbox}
+\usepackage{subcaption}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Algorithms                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Chapter/sections/etc visual style                       %
@@ -109,6 +139,7 @@
     pdftitle={Optimizing fault search in power grid outages through Reinforcement Learning},
     pdfauthor={Angela Carraro}
 }
+\newcommand{\algorithmautorefname}{Algorithm} % To autoreference Algorithms
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Glossary and acronyms | To be loaded after hyperref     %
@@ -139,7 +170,7 @@
 % Metadata                                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\THauthor{Angela Carraro}
-\def\THsupervisor{Antonio Celani, ICTP}%,\\UniTN}
+\def\THsupervisor{Antonio Celani, ICTP}
 \def\THcosupervisor{Andrea Zancola, AcegasApsAmga}
 \def\THextracosupervisor{Luca Bortolussi, UniTS}
 \def\THtitle{Optimizing fault search in power grid outages through Reinforcement Learning}
@@ -151,10 +182,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Actual text                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%\setlength{\parindent}{4em}
-%\setlength{\parskip}{1em}
-\renewcommand{\baselinestretch}{1.1}
 
 \begin{document}
 
