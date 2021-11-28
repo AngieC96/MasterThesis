@@ -7,9 +7,9 @@ In this chapter, we are going to formulate our problem using the frameworks that
 
 \section{The mathematical model}
 
-After a fault occurs and after the technician, together with the remote-control room, restricts it to a limited number of non-remotely-controlled substations, the problem consists in visiting, and thus reconnecting, these substations in an order that minimizes the cost of the fault. We define the \emph{cost of the fault}\index{cost of the fault} as the amount of time each underlying user of each substation remains disconnected.
+After a fault occurs and after the technician, together with the remote control room\index{remote control room}, restricts it to a limited number of non-remotely-controlled substations, the problem consists in visiting, and thus reconnecting, these substations in an order that minimizes the cost of the fault. We define the \emph{cost of the fault}\index{cost of the fault} as the amount of time each underlying user of each substation remains disconnected.
 
-Thus, we are given a set of initially disconnected substations $\mathcal C$, with cardinality $|\mathcal C| = N$, between two remotely controlled substations, where these last ones will not be included in the set, since they are already reconnected. Looking at the electrical schematics of the Trieste power grid, we notice that the number of substations between two remotely controlled ones is always less than $20$, so we can say that in our problem $N < 20$. Luckily, this restricts the dimension of the problem.
+Thus, we are given a set of initially disconnected substations $\mathcal C$, with cardinality $|\mathcal C| = N$, between two remotely controlled substations, where these last ones will not be included in the set, since they are already reconnected. Looking at the electrical diagram\index{electrical diagram} of Trieste's power grid, we notice that the number of substations between two remotely controlled ones is always less than $20$, so we can say that in our problem $N < 20$. Luckily, this restricts the dimension of the problem.
 
 \subsection{Elements of the POMDP}
 
@@ -19,7 +19,7 @@ We define the \emph{state}\index{state} $s$ of the environment as the tuple
 \begin{equation}
     s = (x_g, v_k, \{v\})
 \end{equation}
-where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation in which the technician is, and $\{v\}$ is the set of substations still disconnected after the technician operates in the current substation $v_k$. The set $\{v\}$ can also be chosen to be the set of substations already reconnected, since they are complementary w.r.t. the set $|\mathcal C|$, but we chose to use the disconnected substations to ease the notation. Since the position of the fault is unknown, the variable $x_g$ is \emph{hidden}, while the variables $v_k$ and $\{v\}$ are \emph{observable}. When the fault occurs, the technician can be everywhere: at home if it happens in the middle of the night, at the company, or on the go. So we introduce an extra dummy substation, called substation $0$, which is the position of the technician when the fault occurs. Given this, we have that the \emph{initial state} is always of the form $s_0 = (x_g, 0, \mathcal C)$, thus we have different initial states, one for every possible position of the fault. Instead, a \emph{terminal state} is of the form $s_t = (x_g, v_k, \varnothing)$. If the fault is localized on an electrical cable, then $v_k$ is one of the two substations at the ends of that faulty cable, so we have two different terminal states; while if the fault is in a substation, $v_k$ is that exact substation, so the terminal state is only one. We notice that the initial cost has a random component, which depends on the position of the technician when the fault occurs, so on the position of the substation $0$. To remove this randomness, we could also impose that the technician position is always at the company, but we chose not to do that, in order to be closer to what really happens.
+where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation at which the technician is currently located, and $\{v\}$ is the set of substations still disconnected after the technician operates in the current substation $v_k$. The set $\{v\}$ can also be chosen to be the set of substations already reconnected, since they are complementary w.r.t. the set $|\mathcal C|$, but we chose to use the disconnected substations to ease the notation. Since the position of the fault is unknown, the variable $x_g$ is \emph{hidden}, while the variables $v_k$ and $\{v\}$ are \emph{observable}. When the fault occurs, the technician can be everywhere: at home if it happens in the middle of the night, at the company, or on the go. So we introduce an extra dummy substation, called substation $0$, which is the position of the technician when the fault occurs. Given this, we have that the \emph{initial state} is always of the form $s_0 = (x_g, 0, \mathcal C)$, thus we have different initial states, one for every possible position of the fault. Instead, a \emph{terminal state} is of the form $s_t = (x_g, v_k, \varnothing)$. If the fault is localized on an electrical cable, then $v_k$ is one of the two substations at the ends of that faulty cable, so we have two different terminal states; while if the fault is in a substation, $v_k$ is that exact substation, so the terminal state is only one. We notice that the initial cost has a random component, which depends on the position of the technician when the fault occurs, so on the position of the substation $0$. To remove this randomness, we could also impose that the technician position is always at the company, but we chose not to do that, in order to be closer to what really happens.
 
 We then define the \emph{observation}\index{observation} $o$ that the agent senses from the environment as
 \begin{equation}
@@ -34,7 +34,10 @@ and we will also write the state as $s=(x_g, o)$, where $o = (v_k, \{v\})$ is th
 \end{equation}
 For different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only by the position of the fault $x_g$, this function associates the same observable $o = (v_k, \{v\})$. Thus, we have that $o$ is an equivalence class for $s$. For brevity, we will often keep this dependency implicit, and write simply $o$ instead of $o(s)$, meaning that $o = o(s)$. In particular, the observation of an initial state $s_0 = (x_g, 0, \mathcal C)$ is $o_0 = (0, \mathcal C)$.
 
-We define the \emph{action}\index{action} $a$ that the agent can do as the choice of the specific substation the technician will visit as the next step, thus we have that $a \in \mathcal C$. Actually, since the technician visits only disconnected substations, we have that $a \in \{v\}$, if we are in state $s = (x_g, v_k, \{v\})$.
+We define the \emph{action}\index{action} $a$ that the agent can do as the choice of the specific substation the technician will visit as the next step, thus we have that $a \in \mathcal A = \mathcal C$. Actually, since the technician visits only disconnected substations, and never visits already visited substations, we have that $a \in \{v\}$, if we are in state $s = (x_g, v_k, \{v\})$. Thus, we have that the set of available actions depends on the current state:
+\begin{equation}
+    a \in \mathcal A \big( s = (x_g, v_k, \{v\}) \big) = \{v\} \, .
+\end{equation}
 
 We said that this is a problem with terminal states, which occur when we reconnect all the substations. A terminal state will always be reached, since with every action we visit a substation and can reconnect it, so at the very least we remove that substation from the set of disconnected substations. Actually, if we are lucky, each time we can remove half of the substations from the set of disconnected substations. We are therefore positive that the process terminates. So, for this specific problem, it doesn't make sense to introduce a discount factor $\gamma$ (therefore, we have that $\gamma = 1$ in the formulas of \autoref{chap:RL}).
 
@@ -54,7 +57,7 @@ where $u_v$ is the number of users underneath the substation $v$. So the expecte
     \label{eq:expected-reward}
 \end{equation}
 even if it actually depends only on the previous state $s$ and the action taken $a$, but we will keep the term $s'$ to be consistent with the formulas of \cite{SuttonBarto}.
-For now, in the cost we will ignore the cost of establishing if the fault is before or after the substation in which the technician is, which is complicated and might raise the total cost significantly. This is due to a lack of data. To improve the computation of the cost, we need to carefully take note of the operations the technicians perform when a fault occurs, and then expand the model. To carry out the data collection, we will implement a serverless Telegram bot using \acrshort{aws}.
+For now, in the cost we will ignore the cost of establishing if the fault is before or after the substation in which the technician is, which is complicated and might raise the total cost significantly. This is because we cannot properly model this costs, due to a lack of data on them. To improve the computation of the cost, we need to carefully take note of the operations the technicians perform when a fault occurs, and then expand the model. To carry out the data collection, we will implement a serverless Telegram bot using \acrshort{aws}.
 
 In \autoref{fig:sequence-substations} we can see (part of) a trajectory (we miss the rewards) of our \acrshort{pomdp}, using a set of fictional substations.
 
@@ -124,17 +127,17 @@ Given that we are in a situation of partial observability, as we don't know the 
 
 Then we use the soft-max, or Boltzmann, distribution of \eqref{eq:pi-boltzmann} to construct the policy:
 \begin{equation}
-    \pi \Big( a \;\big|\; o(s) = (v_k, \{v\}), \boldsymbol \theta \Big) = \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \,.
+    \pi \Big( a \;\big|\; o(s) = (v_k, \{v\}); \boldsymbol \theta \Big) = \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \,.
     \label{eq:parameterizedpolicy}
 \end{equation}
 
 So we have that also the policy is a matrix:
 \begin{equation}
-    \pi \Big( a \;\big|\; o(s), \boldsymbol \theta \Big) = \begin{pmatrix}
-        \pi(a_1 | o_1, \boldsymbol \theta) & \pi(a_2 | o_1, \boldsymbol \theta) & \cdots & \pi(a_N | o_1, \boldsymbol \theta) \\
-        \pi(a_1 | o_2, \boldsymbol \theta) & \pi(a_2 | o_2, \boldsymbol \theta) & \cdots & \pi(a_N | o_2, \boldsymbol \theta) \\
+    \pi \Big( a \;\big|\; o(s); \boldsymbol \theta \Big) = \begin{pmatrix}
+        \pi(a_1 | o_1; \boldsymbol \theta) & \pi(a_2 | o_1; \boldsymbol \theta) & \cdots & \pi(a_N | o_1; \boldsymbol \theta) \\
+        \pi(a_1 | o_2; \boldsymbol \theta) & \pi(a_2 | o_2; \boldsymbol \theta) & \cdots & \pi(a_N | o_2; \boldsymbol \theta) \\
         \vdots            &                   &        & \vdots            \\
-        \pi(a_1 | o_{|O|}, \boldsymbol \theta) & \pi(a_2 | o_{|O|}, \boldsymbol \theta)  & \cdots &  \pi(a_N | o_{|O|}, \boldsymbol \theta) \\
+        \pi(a_1 | o_{|O|}; \boldsymbol \theta) & \pi(a_2 | o_{|O|}; \boldsymbol \theta)  & \cdots &  \pi(a_N | o_{|O|}; \boldsymbol \theta) \\
     \end{pmatrix} \, .
 \end{equation}
 The policy cannot depend on the position of the failure, otherwise we would automatically have solved the problem: the policy would suggest going in the substation in which the fault is, or in the two substations at the ends of the faulty electrical cable.
@@ -144,12 +147,12 @@ Note that what matters in \eqref{eq:parameterizedpolicy} is not the absolute val
     \frac{e^{\theta_{o,a} + c}}{\sum_{b \in \{v\}} e^{\theta_{o,b} + c}}
     = \frac{e^c\cdot e^{\theta_{o,a} }}{e^c \sum_{b \in \{v\}} e^{\theta_{o,b}}}
     = \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }}
-    = \pi( a \mid o(s), \boldsymbol \theta) \, .
+    = \pi( a \mid o(s); \boldsymbol \theta) \, .
     \label{eq:policy-plus-constant}
 \end{equation}
 Initially, all parameters are the same and depend neither on the observation nor on the action (e.g., $\boldsymbol \theta = \mathbf 0$, thus $\theta_{o,a} = 0$ for all $o \in \mathcal O, a \in \mathcal A$), so that all actions have an equal probability of being selected. This is called the \emph{random policy}, and in our case is
 \begin{equation}
-    \pi \left( a \;\big|\; o(s), \boldsymbol \theta \right) = \frac{e^{\theta}}{\sum_{b \in \{v\}} e^{\theta}} = \frac{1}{\sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, ,
+    \pi \left( a \;\big|\; o(s); \boldsymbol \theta \right) = \frac{e^{\theta}}{\sum_{b \in \{v\}} e^{\theta}} = \frac{1}{\sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, ,
     \label{eq:rndpolicy}
 \end{equation}
 which means that we randomly choose a substation to visit, since they all have the same uniform probability. Actually, this is true for every choice of $\boldsymbol \theta$ which doesn't depend on the observation-action pair, so also any other constant $c \in \mathbb R$ would do (as we can see from \eqref{eq:policy-plus-constant}), but in practice, to construct a uniform policy, one usually takes $\boldsymbol \theta = \mathbf 0$.
@@ -165,8 +168,8 @@ In our problem, the equation for the \emph{action value function}\index{action v
 \begin{equation}
     \begin{aligned}
         Q_\pi(s,a)
-        &= \sum_{s'} p(s' \mid s, a) \left[ r(s,a,s') + \sum_{a'} \pi(a'|o(s'), \boldsymbol \theta)  Q_\pi (s', a') \right] \\
-        &= \left(d_{v_k, a} \cdot n_{k} + \sum_{a' \in \{v'\}} \pi \Big( a' \big| o \big( \sigma(s,a) \big), \boldsymbol \theta \Big) \, Q \big( \sigma(s,a), a' \big) \right) \, .
+        &= \sum_{s'} p(s' \mid s, a) \left[ r(s,a,s') + \sum_{a'} \pi(a'|o(s'); \boldsymbol \theta)  Q_\pi (s', a') \right] \\
+        &= \left(d_{v_k, a} \cdot n_{k} + \sum_{a' \in \{v'\}} \pi \Big( a' \big| o \big( \sigma(s,a) \big); \boldsymbol \theta \Big) \, Q \big( \sigma(s,a), a' \big) \right) \, .
     \end{aligned}
     \label{eq:myQ}
 \end{equation}
@@ -181,14 +184,14 @@ Now, let us find the formula for $\rho_0(s')$, the probability of starting in st
     \end{aligned}
     \label{eq:myrho}
 \end{equation}
-where $o_0$ is the initial observation, and in the last equivalence we used the Kronecker delta $\delta$. Actually, according to the technicians of the \acrshort{aaa} company, the majority of the faults happens on the electrical cables, usually when they are no longer perfectly isolated (e.g., the wire's insulation breaks down) and they cause a short circuit, being connected to the ground and allowing charge to flow through it. We will try to take advantage of this information at a later moment, but for now we will suppose that every component has the same probability of being damaged.
+where $o_0$ is the initial observation, and in the last equivalence we used the Kronecker delta $\delta$. Actually, according to the technicians of the \acrshort{aaa} company, the majority of the faults happens on the electrical cables, usually when they are no longer perfectly isolated. We will try to take advantage of this information at a later moment, but for now we will suppose that every component has the same probability of being damaged.
 
 Moreover, the formula \eqref{eq:eta} for the function $\eta_\pi(s')$ in our case becomes, thanks to \eqref{eq:transprob} and \eqref{eq:myrho},
 \begin{equation}
     \begin{aligned}
         \eta_\pi\Big(s' = (\, x_g, o'=(v_{k+1}, \{v'\}) \,) \Big)
-        &:= \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a | o(s), \boldsymbol \theta) p(s' | s, a) \\
-        &= \frac1{2N+1} \delta_{o', o_0} + \sum_{s \in \mathrm{pa}(s')} \eta_\pi(s) \pi(v_{k+1} | o(s), \boldsymbol \theta) \, ,
+        &:= \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a | o(s); \boldsymbol \theta) p(s' | s, a) \\
+        &= \frac1{2N+1} \delta_{o', o_0} + \sum_{s \in \mathrm{pa}(s')} \eta_\pi(s) \pi(v_{k+1} | o(s); \boldsymbol \theta) \, ,
     \end{aligned}
     \label{eq:myeta}
 \end{equation}
@@ -198,9 +201,9 @@ Finally, let us define the \emph{performance measure}\index{performance measure}
 \begin{equation}
     \begin{aligned}
         J_\pi(\boldsymbol \theta) 
-        &= \sum_s \rho_0(s) \sum_a \pi_{\boldsymbol \theta} (a|o(s), \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}}(s,a) \\
-        &= \sum_{s} \frac{1}{2N+1} \delta_{o(s), o_0} \sum_a \pi_{\boldsymbol \theta} (a|o(s), \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}}(s,a) \\
-        &=  \sum_{x_g} \frac{1}{2N+1} \sum_a \pi_{\boldsymbol \theta} (a|o_0, \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}} \big( (x_g, o_0),a \big) \, ,
+        &= \sum_s \rho_0(s) \sum_a \pi_{\boldsymbol \theta} (a|o(s); \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}}(s,a) \\
+        &= \sum_{s} \frac{1}{2N+1} \delta_{o(s), o_0} \sum_a \pi_{\boldsymbol \theta} (a|o(s); \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}}(s,a) \\
+        &=  \sum_{x_g} \frac{1}{2N+1} \sum_a \pi_{\boldsymbol \theta} (a|o_0; \boldsymbol \theta) \, Q_{\pi_{\boldsymbol \theta}} \big( (x_g, o_0),a \big) \, ,
     \end{aligned}
     \label{eq:myJ}
 \end{equation}
@@ -215,7 +218,8 @@ We will use one of the \emph{policy gradient methods}\index{policy gradient meth
 
 The formula of the gradient in \eqref{eq:gradJ} in our case becomes
 \begin{equation}
-    \nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta) = \sum_s \eta_{\pi_{\boldsymbol \theta}}(s) \sum_a Q_{\pi_{\boldsymbol \theta}}(s,a) \nabla_{\boldsymbol \theta} \pi(a|o(s), \boldsymbol \theta) \, .
+    \nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta) = \sum_{s \in \mathcal S} \eta_{\pi_{\boldsymbol \theta}}(s) \sum_{a \in \mathcal A(s)} Q_{\pi_{\boldsymbol \theta}}(s,a) \nabla_{\boldsymbol \theta} \pi(a|o(s); \boldsymbol \theta) \, .
+    \label{eq:mygradJ_oneline}
 \end{equation}
 
 So, given that $\boldsymbol \theta$ is a matrix $\boldsymbol \theta = (\theta_{o,a})_{o \in \mathcal O, a \in \mathcal A}$, we have that also the gradient is a matrix:
@@ -232,41 +236,44 @@ where $N$ is the number of initially disconnected substations.
 First of all, let us compute the gradient of the policy $\pi$. Given the equation of the policy in $\eqref{eq:parameterizedpolicy}$, we have that its derivative is
 \begin{equation}
     \begin{aligned}
-        \frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}), \boldsymbol \theta \Big)
+        \frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}); \boldsymbol \theta \Big)
         &= \frac{\partial}{\partial \theta_{o',a'}} \left( \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
         &= \delta_{o',o} \cdot \frac{\delta_{a',a} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} } -  e^{\theta_{o,a} } \cdot e^{\theta_{o, a'} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b}})^2} \\
         &= \delta_{o',o} \cdot \left( \frac{\delta_{a',a} \cdot e^{\theta_{o,a} } \cdot \sum_{b \in \{v\}} e^{\theta_{o,b} }}{(\sum_{b \in \{v\}} e^{\theta_{o,b} })^2} - \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }}\cdot\frac{e^{\theta_{o,a'} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \right) \\
-        &= \delta_{o',o} \cdot \left( \delta_{a',a} \pi(a|o) - \pi(a|o) \pi(a'|o) \right) \\
-        &= \delta_{o',o} \left( \delta_{a',a} - \pi(a'|o) \right) \, \pi(a|o)  \, ,
+        &= \delta_{o',o} \cdot \left( \delta_{a',a} \pi(a|o; \boldsymbol \theta) - \pi(a|o; \boldsymbol \theta) \pi(a'|o; \boldsymbol \theta) \right) \\
+        &= \delta_{o',o} \left( \delta_{a',a} - \pi(a'|o; \boldsymbol \theta) \right) \, \pi(a|o; \boldsymbol \theta)  \, ,
     \end{aligned}
     \label{eq:gradpi}
 \end{equation}
 since if $o \neq o'$ we have that $\theta_{o',a'}$ and $\theta_{o,a}$ are ultimately different parameters. In particular, for the random policy (so when $\boldsymbol \theta = \mathbf 0$) we have that
 \begin{equation}
-    \left. \frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}), \boldsymbol \theta \Big) \right|_{\boldsymbol \theta = \mathbf 0}
+    \left. \frac{\partial}{\partial \theta_{o',a'}} \pi \Big( a \;\big|\; o=(v_k, \{v\}); \boldsymbol \theta \Big) \right|_{\boldsymbol \theta = \mathbf 0}
     = \delta_{o',o} \left(\frac1{|\{v\}|} \delta_{a',a} - \frac1{|\{v\}|^2} \right)
     \label{eq:deriv-pi}
 \end{equation}
-Therefore, we have that also the gradient of the policy is a matrix:
+The gradient of the policy is a matrix with dimensions $(o',a') \times (o,a) \in \mathcal O \times \mathcal A \times \mathcal O \times \mathcal A$, but for a fixed observation $o$ and for a fixed action $a$ it is a matrix:
 \begin{equation}
-    \nabla_{\boldsymbol \theta} \pi(a|o, \boldsymbol \theta) = \begin{pmatrix}
-        \frac{\partial}{\partial \theta_{o_1,a_1}} \pi ( a | o, \boldsymbol \theta )
-            %& \frac{\partial}{\partial \theta_{o_1,a_2}} \pi ( a | o, \boldsymbol \theta )
-            & \cdots & \frac{\partial}{\partial \theta_{o_1,a_N}} \pi ( a | o, \boldsymbol \theta ) \\
-        \vdots & & & \vdots \\
-        \frac{\partial}{\partial \theta_{o_{|O|},a_1}} \pi ( a | o, \boldsymbol \theta ) 
-            %& \frac{\partial}{\partial \theta_{o_{|O|},a_2}} \pi ( a | o, \boldsymbol \theta )
-            & \cdots & \frac{\partial}{\partial \theta_{o_{|O|},a_N}} \pi ( a | o, \boldsymbol \theta ) \\
+    \nabla_{\boldsymbol \theta} \pi(a|o; \boldsymbol \theta) = \begin{pmatrix}
+        \frac{\partial}{\partial \theta_{o_1,a_1}} \pi ( a | o; \boldsymbol \theta )
+            %& \frac{\partial}{\partial \theta_{o_1,a_2}} \pi ( a | o; \boldsymbol \theta )
+            & \cdots & \frac{\partial}{\partial \theta_{o_1,a_N}} \pi ( a | o; \boldsymbol \theta ) \\
+        \vdots & &
+        %&
+        \vdots \\
+        \frac{\partial}{\partial \theta_{o_{|O|},a_1}} \pi ( a | o; \boldsymbol \theta ) 
+            %& \frac{\partial}{\partial \theta_{o_{|O|},a_2}} \pi ( a | o; \boldsymbol \theta )
+            & \cdots & \frac{\partial}{\partial \theta_{o_{|O|},a_N}} \pi ( a | o; \boldsymbol \theta ) \\
     \end{pmatrix}
 \end{equation}
+Actually, the term $\delta_{o',o}$ in \eqref{eq:gradpi} tell us that $o'$ and $o$ must coincide, so we can say that the dimension of $\nabla_{\boldsymbol \theta} \pi_{\boldsymbol \theta}$ is $\mathcal O \times \mathcal A \times \mathcal A$.
 
 Given this, we have that
 \begin{equation}
     \begin{aligned}
         \nabla_{\theta_{o',a'}} J_\pi (\boldsymbol \theta)
-        &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
         &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)} \Big( \big( \delta_{a',a} - \pi(a'|o(s)) \big) \, \pi(a|o(s)) \Big) \\
-        &= \sum_{x_g} \eta_\pi((x_g, o')) \sum_a Q_\pi((x_g, o'),a) \left( \delta_{a,a'} - \pi(a'|o') \right) \, \pi(a|o') \, ,
+        &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) \sum_a Q_\pi \big((x_g, o'),a \big) \big( \delta_{a,a'} - \pi(a'|o') \big) \, \pi(a|o') \, ,
     \end{aligned}
     \label{eq:mygradJ}
 \end{equation}
@@ -282,8 +289,35 @@ In general, there is no guarantee that this is a convex problem in the parameter
 If we have the intuition that there is a deterministic sequence of actions to be performed, we have that their parameters $\theta_{\cdot,a}$ tend to infinity. This is because the deterministic policies correspond to a one-hot vector in which we have $1$ for only one action and $0$ for all the other actions, and in the soft-max policy this happens when the parameter associated with this action becomes much bigger than the others, so that when we normalize it with the parametrization of the policy it becomes $1$ while the others are so small that becomes $0$. If it is so, the gradient descent never stops and there could be problems of overflowing on the values of the policy, since the parameters $\boldsymbol \theta$ can become very large, and the exponentials of the soft-max would explode. A smart thing to do when this happens is to rewrite the parametrization in the following way (the observation $o$ is fixed):
 \begin{equation}
     \pi(a | o) = \frac{e^{\theta_{o,a}}}{\sum_b e^{\theta_{o,b}}} = \frac{e^{-(\max_{a'} \theta_{o,a'} - \theta_{o,a})}}{\sum_b e^{-(\max_{a'} \theta_{o,a'} - \theta_{o,b})}} \, .
+    \label{eq:pi-clipped}
 \end{equation}
 The benefit of writing the policy in this way is that, since the exponents of the two exponentials are negative (the parts in the parenthesis, $\max_{a'} \theta_{o,a'} - \theta_{o,\cdot}$, are always positive), it never explodes. In fact, negatives with large exponents ``saturate'' to zero rather than infinity, so we have a better chance of avoiding NaNs. This is a simple numerical trick that allows improving the stability of the algorithm. %([link](https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/))
+
+
+\subsubsection{Natural policy gradient}
+
+Following what we said in \autoref{sec:npg}, and given that the derivative of our policy is \eqref{eq:gradpi}, we have that
+
+\begin{equation}
+    \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s)) = I_{(\mathcal O, \mathcal A) \times (\mathcal O, \mathcal A)} = \delta_{o', o(s)} \delta_{a',a} \, .
+\end{equation}
+
+Then the equation of the natural gradient of the performance measure $J(\boldsymbol \theta)$ of \eqref{eq:natgradJ}, which was
+\begin{equation*}
+    \widetilde \nabla_{\boldsymbol \theta} J(\boldsymbol \theta) = F^{-1}(\boldsymbol \theta) \nabla_{\boldsymbol \theta} J(\boldsymbol \theta) \, ,
+\end{equation*}
+in our case becomes, thanks to the equation of the natural gradient of $\pi$ used in equation \eqref{eq:mygradJ_oneline},
+\begin{equation}
+    \begin{aligned}
+        \widetilde \nabla_{\theta_{o',a'}} J_\pi (\boldsymbol \theta)
+        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+        &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o', o(s)} \delta_{a',a} \\
+        &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) Q_\pi \big((x_g, o'), a' \big)\, .
+    \end{aligned}
+    \label{eq:mynatgradJ}
+\end{equation}
+
+This is a very nice result, in that we have a very simple equation for the gradient of the performance measure $J(\boldsymbol \theta)$, which is also guaranteed to converge faster to a minimum, although not a global one.
 
 
 \section{Implementation of the model}
@@ -300,36 +334,39 @@ Then we proceed with the computation of the matrix of $Q_\pi$. We constructed th
 \end{equation}
 Then we use it to initialize the matrix which will store the values of $Q_\pi$. Recall that in the equation for $Q_\pi$, \eqref{eq:myQ}, we use the values of $Q_\pi$ of the next states $s'$ to compute the value of $Q_\pi$ for the current state $s$. Thus, we need to use the states' dependency graph from the leaves to the roots to compute the matrix of $Q_\pi$ bottom-up. We perform a personalized \emph{breadth-first-search}\index{breadth-first-search}, or \acrshort{bfs}, on the states' dependency graph, in order to be able to add each next-state contribution to the value of $Q_\pi$ for the current state. A breadth-first-search is an algorithm for exploring a graph, which visits every node and every edge of the latter. In a breadth-first-search, the nodes are visited in order of increasing distance from the source of the visit, where the distance among the source and a generic node is the minimum number of edges in a path among them \cite{Montresor2014}. In our modified \acrshort{bfs} instead, we start from the terminal states in the leaves, and then we visit all the edges of the graph in a breadth-first-search order, with every edge traversed in the reverse direction in order to arrive at the initial state in the root, and with all the out-edges of a node visited before the visiting that node itself, so to have finished computing the $Q_\pi$ value of a node, having added all the terms deriving from its children, before using it to compute another $Q_\pi$ value.
 
+One might wonder why, having a linear system, we didn't use any of the already existing algorithms to solve it. This is because we don't have a matrix of the linear system, and we don't have an easy way to create it through matrix multiplications. To create the matrix $A$ of the linear system, which would be needed for algorithms like the Gauss elimination method (a direct method) or the Jacobi or Gauss-Seidel methods (iterative ones), we would need firstly to traverse the graph like we explained, writing the coefficients of the terms of the equations of the linear system in $A$. Then we would still have to solve the linear system with one of the previous methods. Instead of writing coefficients, though, we can add terms and solve directly the system. This also applies to the computation of the vector $\eta_\pi$.
+
 After this, we proceed with computing the matrix of $\eta_\pi$. In equation \eqref{eq:myeta} we have that to compute the value of $\eta_\pi$ for a state $s'$ we use the values of $\eta_\pi$ of all its preceding states $s$. Thus, we will use the states' dependency graph from the roots to the leaves to compute the $\eta_\pi$ matrix top-down. As we did for the matrix of $Q_\pi$, we perform a personalized \acrshort{bfs} on the states' dependency graph, which visits all the edges and visits a node only after all its in-edges have been visited, in order to have added to the $\eta_\pi$ value of that node all the terms deriving from its parents before using it to compute another $\eta_\pi$ value.
 
 We could not have used a depth-first search, or \acrshort{dfs}, to compute $Q_\pi$ and $\eta_\pi$. In a \acrshort{dfs}, contrary to a \acrshort{bfs}, after visiting a node the search proceeds as far as possible from it along a path, until it is reached a node whose adjacent nodes have all already been visited. Then the search goes back along the last edge and continues moving away along another path not yet visited \cite{Montresor2014}. Thus, using a \acrshort{dfs}, it would be impossible to visit all the in-edges (or the out-edges in the reverse order) of a node before visiting the node itself.
 
-Having the matrix of the policy $\pi_{\boldsymbol \theta}$ and the matrix of $Q_\pi$, we can compute the performance measure $J_\pi (\boldsymbol \theta)$ using the last equivalence of \eqref{eq:myJ}. Instead, for the computation of the gradient of $J_\pi (\boldsymbol \theta)$, $\nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)$, we use also the matrix $\eta_\pi$, following equation \eqref{eq:mygradJ}.
+Having the matrix of the policy $\pi_{\boldsymbol \theta}$ and the matrix of $Q_\pi$, we can compute the performance measure $J_\pi (\boldsymbol \theta)$ using the last equivalence of \eqref{eq:myJ}. Instead, for the computation of the gradient of $J_\pi (\boldsymbol \theta)$, $\nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)$, we use also the matrix $\eta_\pi$, following equation \eqref{eq:mygradJ}. Since the convergence with the ordinary gradient was quite slow, we implemented also the natural gradient $\widetilde \nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)$, following equation \eqref{eq:mynatgradJ}. Given the higher values of $\boldsymbol \theta$ that the natural gradient can achieve, it is mandatory to implement the clipped version of the policy of \eqref{eq:pi-clipped}.
 
 How to choose the learning parameter $\alpha$ appropriately? We want the difference $\boldsymbol \theta_{k+1} - \boldsymbol \theta_k$ in \eqref{eq:grad-descent} to be small, in particular, we want $\boldsymbol \theta_{k+1} - \boldsymbol \theta_k \ll 1$, thus it must be also $\alpha \, |\nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)| \ll 1$. Given that we have $Q_\pi \sim 10^6$ and $\eta_\pi \sim 10^{-2}$, we choose $\alpha \sim 10^{-6}$. Actually, in later experiments we set an adaptive $\alpha$ which is $1 / \max(Q_\pi)$, in order to speed up the convergence and avoid using a really small $\alpha$ w.r.t. the value of $Q_\pi$.
 
 After having computed all the elements that we need, we proceed to perform the gradient descent, stopping when the percentage relative error among two subsequent values of $J_\pi (\boldsymbol \theta)$ is less than $1\%$. Actually, since we have a very little value of $\alpha$, we rescale for it.
 
-% In \autoref{alg:policy_gradient} we can see the pseudocode of the algorithm we used.
+In \autoref{alg:policy_gradient} we can see the pseudocode of the algorithm we used.
 % % The ~ is used to avoid a line break between the two since they're considered a "single unit".
 
-% \begin{algorithm}
-%     \caption{An algorithm with caption}
-%     \label{alg:policy_gradient}
-%     \begin{algorithmic}
-%         \Require $n \geq 0$
-%         \Ensure $y = x^n$
-%         \State $y \gets 1$
-%         \State $X \gets x$
-%         \State $N \gets n$
-%         \While{$N \neq 0$}
-%         \If{$N$ is even}
-%             \State $X \gets X \times X$
-%             \State $N \gets \frac{N}{2}$  \Comment{This is a comment}
-%         \ElsIf{$N$ is odd}
-%             \State $y \gets y \times X$
-%             \State $N \gets N - 1$
-%         \EndIf
-%         \EndWhile
-%     \end{algorithmic}
-% \end{algorithm}
+\begin{algorithm}
+    \DontPrintSemicolon
+    \caption{Policy gradient descent}
+    \label{alg:policy_gradient}
+        \KwData{The error tollerance: $\mathrm{tol}$}
+        Initialize $\boldsymbol \theta = \mathbf 0$\;
+        \Loop{
+          Compute the matrix $\pi \gets \big( \pi ( a | o(s); \boldsymbol \theta ) \big)_{o \in \mathcal O, a \in \mathcal A}$\;
+          Compute the vector $\eta \gets \big( \eta_\pi(s) \big)_{s \in \mathcal S}$\;
+          Compute the matrix $Q \gets \big( Q_\pi(s, a) \big)_{s \in \mathcal S, a \in \mathcal A(s)}$\;
+          $\alpha \gets 1/ \max(Q)$\;
+          Compute $G \gets \nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)$ or $G \gets \widetilde \nabla_{\boldsymbol \theta} J_\pi (\boldsymbol \theta)$\;
+          Compute $J \gets J_\pi (\boldsymbol \theta)$\;
+          $\mathrm{error} \gets |J - J_\mathrm{old}|/J_\mathrm{old} \cdot 100 \cdot 1/\alpha$ \;
+          \If{$\mathrm{error}< \mathrm{tol}$}{
+            \Break
+          }
+          Compute $\boldsymbol \theta \gets \boldsymbol \theta - \alpha G$\;
+          Set $J_\mathrm{old} = J$
+        }
+\end{algorithm}

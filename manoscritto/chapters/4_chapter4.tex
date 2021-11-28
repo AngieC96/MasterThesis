@@ -164,21 +164,21 @@ Policy gradient methods present some perks that make them highly valuable: the p
 
 We will denote the policy's parameters' vector with $\boldsymbol \theta \in \mathbb R^{d'}$, and we will write, as in \eqref{eq:policy-theory},
 \begin{equation}
-    \pi(a|s,\boldsymbol \theta) = \text{Pr}\{A_t = a | S_t = s, \boldsymbol \theta_t = \boldsymbol {\theta}\} \, ,
+    \pi(a|s,\boldsymbol \theta) = \text{Pr}\{A_t = a | S_t = s; \boldsymbol \theta_t = \boldsymbol {\theta}\} \, ,
     \label{eq:policy-with-parameters}
 \end{equation}
 for the probability of taking action $a$ being in state $s$ at time $t$ with parameters $\boldsymbol \theta$ \cite{SuttonBarto}. The policy can be parametrized in any way, as long as it is differentiable with respect to its parameters, which means that the column vector of partial derivatives of $\pi$ w.r.t. the components of the parameters' vector $\boldsymbol \theta$, $\nabla_{\boldsymbol \theta} \pi (a|s,\boldsymbol \theta)$, exists and is finite for all $s \in \mathcal S, a \in \mathcal A$ and $\boldsymbol \theta \in \mathbb R^{d'}$. In particular, as described in \cite{Peters2010}, for discrete problems is often used the (exponential) soft-max distribution (i.e., Gibbs or Boltzmann distribution)
 \begin{equation}
-    \pi(a|s, \boldsymbol \theta) = \frac{e^{\phi(s,a)^\top \boldsymbol \theta}}{\sum_{b \in \mathcal A} e^{\phi(s,b)^\top \boldsymbol \theta}} \, ,
+    \pi(a|s, \theta) = \frac{e^{\phi(s,a)^\top \theta}}{\sum_{b \in \mathcal A} e^{\phi(s,b)^\top \theta}} \, ,
     \label{eq:pi-boltzmann}
 \end{equation}
 while for continuous problems it is used the Gaussian distribution
 \begin{equation}
-    \pi(a|s, \boldsymbol \theta) = \mathcal N(\phi(s,a)^\top \boldsymbol \theta_1, \boldsymbol \theta_2) \, ,
+    \pi(a|s, \theta) = \mathcal N(\phi(s,a)^\top \theta_1, \theta_2) \, ,
 \end{equation}
-where $\boldsymbol \theta_2$ is an exploration parameter, and $\phi(s,a) \in \mathbb R^{d'}$ is a feature vector characterizing state $s$ and action $a$ \cite{Sutton2000}.
+where $\theta_2$ is an exploration parameter, and $\phi(s,a) \in \mathbb R^{d'}$ is a feature vector characterizing state $s$ and action $a$ \cite{Sutton2000}.
 
-To learn the policy parameters $\boldsymbol \theta$ we will use the  gradient of some scalar \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ --- which can also be directly the expected return --- with respect to the policy parameters. If the performance $J_\pi(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J_\pi(\boldsymbol \theta)$:
+To learn the policy parameters $\boldsymbol \theta$, we will use the  gradient of some scalar \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ --- which can also be directly the expected return --- with respect to the policy parameters. If the performance $J_\pi(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J_\pi(\boldsymbol \theta)$:
 \begin{equation}
     \boldsymbol \theta_{k+1} = \boldsymbol \theta_k + \alpha \nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta_k) \, ;
     \label{eq:grad-ascent}
@@ -218,10 +218,99 @@ See \cite{SuttonBarto} for the demonstration in the episodic case, which involve
 Thus, solving the expression for \eqref{eq:gradJ} and using it in equations \eqref{eq:grad-ascent} -- \eqref{eq:grad-descent} allows optimizing the parameters of the policy, building an optimal policy in the chosen parametrization class. Note that to find both $\eta_\pi$ and $Q_\pi$ we need to solve two linear systems, \eqref{eq:Q-recursive} and \eqref{eq:eta}, and, moreover, they depend on the policy $\pi$, thus they must be solved at every iteration.
 
 
-%\subsection{Natural policy gradient}
+\subsection{Natural policy gradient}
+\label{sec:npg}
 
-% See Natural actor critic, Peters, Vijayakumar, Schaal, European Conference on Machine Learning (2005).
+In \cite{Amari1998}, it is introduced the \emph{natural gradient learning method}\index{natural gradient learning method}, which is a new way of performing a gradient descent algorithm for supervised learning problems, using a different formula for the gradient. This method is proved to be statistically efficient and does not get stuck in plateaus, like the conventional stochastic gradient learning does. This is because the ordinary gradient of a function, in some parameters spaces, does not identify its steepest direction, while the natural gradient does.
 
-% See (Hennes, Neural Replicator Dynamics: Multiagent Learning via Hedging Policy Gradients) \href{https://arxiv.org/pdf/1906.00190.pdf}{here} (page 8, appendix A4) for proof of natural gradient.
+This method has also been applied in \acrshort{rl} in policy gradient algorithms \cite{Peters2008}, and where the improvements were made using the gradient $\nabla_{\boldsymbol \theta} J(\boldsymbol \theta)$ of the performance measure\index{performance measure} $J(\boldsymbol \theta)$, the \emph{natural gradient}\index{natural gradient} $\widetilde \nabla_{\boldsymbol \theta} J(\boldsymbol \theta)$ is used instead. The difference is that the first follows the steepest direction in the parameter space, while the latter follows the steepest direction with respect to the Fisher metric, given by
+\begin{equation}
+    \widetilde \nabla_{\boldsymbol \theta} J(\boldsymbol \theta) = F^{-1}(\boldsymbol \theta) \nabla_{\boldsymbol \theta} J(\boldsymbol \theta)
+    \label{eq:natgradJ}
+\end{equation}
+where $F(\boldsymbol \theta)$ denotes the \emph{Fisher information matrix}\index{Fisher information matrix}. Since it can be proved that the angle between the two different gradients is never larger than ninety degrees, the convergence to the next local optimum is guaranteed. The natural policy gradient turns out to be significantly more efficient than normal gradients, since the convergence to the local minima is much faster.
 
-% Amari, S. I. (1998). Natural gradient works efficiently in learning. Neural Computation, 10(2):251–276.
+The \emph{Fisher information}\index{Fisher information} is a metric which measures how much information a random variable $X$ carries about an unknown parameter $\theta$ that parametrizes the probability density function $f(X; \theta)$ of the variable $X$ itself. It has formula
+\begin{equation}
+    \mathcal F (\theta)
+    = \mathbb E_\theta \left[ \left( \frac{\partial}{\partial \theta} \log f(X; \theta) \right)^2 \right]
+    = \int_{\mathbb R} \left( \frac{\partial}{\partial \theta} \log f(x; \theta) \right)^2 f(x; \theta) \, dx \, .
+    \label{eq:Fisher-information}
+\end{equation}
+If the density function $f(x; \theta)$ is at least twice differentiable with respect to the parameter $\theta$, and under certain regularity conditions, then the Fisher information may also be written as
+\begin{equation}
+    \mathcal F(\theta)
+    = -\mathbb E_\theta \left[ \frac{\partial^2}{\partial \theta^2} \log f(X; \theta) \right] \, .
+\end{equation}
+The identity subsists as
+\begin{align*}
+    \frac{\partial^2}{\partial \theta^2} \log f(X; \theta)
+    &= \frac{\partial}{\partial \theta} \left( \frac{1}{f(X; \theta)} \frac{\partial}{\partial \theta} f(X; \theta) \right) \\
+    &= - \frac{1}{f(X; \theta)^2} \left( \frac{\partial}{\partial \theta} f(X; \theta) \right)^2 + \frac{1}{f(X; \theta)} \frac{\partial^2}{\partial \theta^2} f(X; \theta) \, ,
+\end{align*} 
+but
+\begin{align*}
+    \mathbb E_\theta \left[ \frac{1}{f(X; \theta)} \frac{\partial^2}{\partial \theta^2} f(X; \theta) \right]
+    &= \int_{\mathbb R} \frac{1}{f(X; \theta)} \frac{\partial^2}{\partial \theta^2} f(X; \theta) \cdot f(X; \theta) dx
+    = \int_{\mathbb R} \frac{\partial^2}{\partial \theta^2} f(X; \theta) dx \\
+    &= \frac{\partial^2}{\partial \theta^2} \int_{\mathbb R} f(X; \theta) dx
+    = \frac{\partial^2}{\partial\theta^2} 1 = 0 \, .
+\end{align*}
+% thus we have that
+% \begin{align*}
+%     \mathbb E_\theta \left[ \left( \frac{\partial}{\partial\theta} \log f(X; \theta) \right)^2 \right] &= \mathbb E_\theta \left[ \left( \frac{1}{f(X; \theta)} \frac{\partial}{\partial\theta} f(X; \theta) \right)^2 \right]
+%     = \mathbb E_\theta \left[ \frac{1}{f(X; \theta)^2} \left( \frac{\partial}{\partial\theta} f(X; \theta) \right)^2 \right] =\\
+%     &= - \mathbb E_\theta \left[ -\frac{1}{f(X; \theta)^2} \left( \frac{\partial}{\partial\theta} f(X; \theta) \right)^2 \right] + \mathbb E_\theta \left[ \frac{1}{f(X; \theta)} \frac{\partial^2}{\partial\theta^2} f(X; \theta) \right] =\\
+%     &= -\mathbb E_\theta \left[ -\frac{1}{f(X; \theta)^2} \left( \frac{\partial}{\partial\theta} f(X; \theta) \right)^2 + \frac{1}{f(X; \theta)} \frac{\partial^2}{\partial\theta^2} f(X; \theta) \right] =\\
+%     &= -\mathbb E_\theta \left[ \frac{\partial^2}{\partial\theta^2} \log f(X; \theta) \right]
+% \end{align*}
+Thus, we have that $\mathcal F(\theta)$ provides a measure of the intensity of the local curvature of the function $\log f(X; \theta)$ in a neighborhood of $\theta$: the larger $\mathcal F(\theta)$, i.e., the more pronounced the curvature of $\log f(X; \theta)$, the more concentrated the function $\log f(X; \theta)$ is around $\theta$, and the more information we have.
+
+Consider the specific case of the soft-max policy \eqref{eq:pi-boltzmann}, where instead of defining the function $\phi(s,a)$, we take a parameter for each state $s$ and action $a$, $\theta_{s,a}$, obtaining a parameters' matrix $\boldsymbol \theta = (\theta_{s,a})_{s \in \mathcal S, a \in \mathcal A}$ (actually, it is a vector, but the visualization as a matrix is more convenient):
+\begin{equation}
+    \pi(a|s; \boldsymbol \theta) = \frac{e^{\theta_{s,a}}}{\sum_{d \in \mathcal A} e^{\theta_{s,d}}} \, .
+\end{equation}
+Following \cite{Hennes2020} (appendix A.4), we then define the Fisher information matrix\index{Fisher information matrix} $F$ of the previous policy $\pi_{\boldsymbol \theta}$ as $F(\boldsymbol \theta) = (F_{s,a,s',b})_{s,s' \in \mathcal S, a,b \in \mathcal A}$, where, for a specific state $s$,
+\begin{equation}
+    F_{a,b} = \sum_{c \in \mathcal A} \left( \frac{\partial}{\partial_{\theta_{s,a}}} \log \pi(c|s; \boldsymbol \theta) \right) \left( \frac{\partial}{\partial_{\theta_{s,b}}} \log \pi(c|s; \boldsymbol \theta) \right) \pi(c|s; \boldsymbol \theta) \, ,
+    \label{eq:Fisher-matrix}
+\end{equation}
+in which we used the second equivalence of \eqref{eq:Fisher-information}.
+
+First of all, we have that the gradient of the policy, $\nabla_{\boldsymbol \theta} \pi_{\boldsymbol \theta}$, has dimensions $(s', a') \times (s,a) \in (\mathcal S, \mathcal A) \times (\mathcal S, \mathcal A)$, and in particular the derivative of this policy, for a fixed state $s$, is
+\begin{equation*}
+    \begin{aligned}
+        \frac{\partial}{\partial \theta_{s, a}} \pi(c | s; \boldsymbol \theta)
+        &= \frac{\partial}{\partial \theta_{s, a}} \left(\frac{e^{\theta_{s,c} }}{\sum_{d \in \mathcal A} e^{\theta_{s,d} }} \right) \\
+        &= \frac{\delta_{a,c} \cdot e^{\theta_{s,c} } \cdot \sum_{d \in \mathcal A} e^{\theta_{s,d} } -  e^{\theta_{s,c} } \cdot e^{\theta_{s, a} }}{(\sum_{d \in \mathcal A} e^{\theta_{s,d}})^2} \\
+        &= \left(\frac{\delta_{a,c} \cdot e^{\theta_{s,c} } \cdot \sum_{d \in \mathcal A} e^{\theta_{s,d} }}{(\sum_{d \in \mathcal A} e^{\theta_{s,d} })^2} - \frac{e^{\theta_{s,c} }}{\sum_{d \in \mathcal A} e^{\theta_{s,d} }}\cdot\frac{e^{\theta_{s,a} }}{\sum_{d \in \mathcal A} e^{\theta_{s,d} }} \right) \\
+        &= \left(\delta_{a,c} - \pi(a | s; \boldsymbol \theta) \right) \pi(c|s; \boldsymbol \theta)  \, .
+    \end{aligned}
+\end{equation*}
+Thus, in this case, we have that
+\begin{align*}
+    F_{a,b}
+    &= \sum_{c \in \mathcal A} \left( \frac{\partial}{\partial_{\theta_{s,a}}} \log \pi(c|s; \boldsymbol \theta) \right) \left( \frac{\partial}{\partial_{\theta_{s,b}}} \log \pi(c|s; \boldsymbol \theta) \right) \pi(c|s; \boldsymbol \theta) \\
+    &= \sum_{c \in \mathcal A} \left( \frac1{\pi(c|s; \boldsymbol \theta)} \frac{\partial}{\partial_{\theta_{s,a}}} \pi(c|s; \boldsymbol \theta) \right) \left( \frac1{\pi(c|s; \boldsymbol \theta)} \frac{\partial}{\partial_{\theta_{s,b}}} \pi(c|s; \boldsymbol \theta) \right) \pi(c|s; \boldsymbol \theta) \\
+    &= \sum_{c \in \mathcal A} \left( \frac1{\pi(c|s; \boldsymbol \theta)} \big( \delta_{a,c} - \pi(a|s; \boldsymbol \theta) \big) \, \pi(c|s; \boldsymbol \theta) \right) \left( \frac1{\pi(c|s; \boldsymbol \theta)} \big( \delta_{b,c} \right.\\
+    & \qquad\qquad  - \pi(b|s; \boldsymbol \theta) \big) \, \pi(c|s; \boldsymbol \theta) \bigg) \pi(c|s; \boldsymbol \theta) \\
+    &= \sum_{c \in \mathcal A} \big( \delta_{a,c} - \pi(a|s; \boldsymbol \theta) \big) \big( \delta_{b,c} - \pi(b|s; \boldsymbol \theta) \big) \pi(c|s; \boldsymbol \theta) \\
+    &= \sum_{c \in \mathcal A} \big[ \big( \delta_{a,c} - \pi(a|s; \boldsymbol \theta) \big) \delta_{b,c} \pi(c|s; \boldsymbol \theta) - \big( \delta_{a,c} - \pi(a|s; \boldsymbol \theta) \big) \pi(b|s; \boldsymbol \theta) \pi(c|s; \boldsymbol \theta) \big]\\
+    &= \big( \delta_{a,b} - \pi(a|s; \boldsymbol \theta) \big) \pi(b|s; \boldsymbol \theta) - \pi(b|s; \boldsymbol \theta) \pi(a|s; \boldsymbol \theta) + \pi(a|s; \boldsymbol \theta) \pi(b|s; \boldsymbol \theta) \sum_{c \in \mathcal A} \pi(c|s; \boldsymbol \theta) \\
+    &= \big( \delta_{a,b} - \pi(a|s; \boldsymbol \theta) \big) \pi(b|s; \boldsymbol \theta) \, .
+\end{align*}
+This gives us, for a specific state $s$,
+\begin{equation}
+    F_{a,b} = \big( \delta_{a,b} - \pi(a|s; \boldsymbol \theta) \big) \pi(b|s; \boldsymbol \theta) = \frac{\partial}{\partial \theta_{s, a}} \pi(b | s; \boldsymbol \theta) \, ,
+\end{equation}
+which means that
+\begin{equation}
+    F = \nabla_{\boldsymbol \theta} \pi_{\boldsymbol \theta} \, ,
+\end{equation}
+and therefore we have that
+\begin{equation}
+    \widetilde \nabla \pi = F^{-1} \nabla_{\boldsymbol \theta} \pi_{\boldsymbol \theta} =  I_{(\mathcal S, \mathcal A) \times (\mathcal S, \mathcal A)} \, .
+    \label{eq:nat-grad-pi}
+\end{equation}
+
+This is a very important result since it allows avoiding computing, and then inverting, the information matrix $F$, saving quite some computational time.

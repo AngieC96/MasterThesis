@@ -97,7 +97,6 @@
 %  url       = {https://doi.org/10.1007/978-0-387-30164-8_642}
 %}
 
-
 @inproceedings{Aberdeen2002ScalingIP,
   author    = {D. Aberdeen and Jonathan Baxter},
   title     = {Scaling Internal-State Policy-Gradient Methods for POMDPs},
@@ -133,6 +132,40 @@
   year      = {2000}
 }
 %  url       = {https://proceedings.neurips.cc/paper/1999/file/464d828b85b0bed98e80ade0a5c43b0f-Paper.pdf},
+%}
+
+@inproceedings{Hennes2020,
+  author    = {Hennes, Daniel and Morrill, Dustin and Omidshafiei, Shayegan and Munos, R\'{e}mi and Perolat, Julien and Lanctot, Marc and Gruslys, Audrunas and Lespiau, Jean-Baptiste and Parmas, Paavo and Du\`{e}\~{n}ez-Guzm\'{a}n, Edgar and Tuyls, Karl},
+  title     = {Neural Replicator Dynamics: Multiagent Learning via Hedging Policy Gradients},
+  booktitle = {Proceedings of the 19th International Conference on Autonomous Agents and MultiAgent Systems},
+  year      = {2020},
+  isbn      = {9781450375184},
+  publisher = {International Foundation for Autonomous Agents and Multiagent Systems},
+  address   = {Richland, SC},
+  pages     = {492–501},
+  numpages  = {10},
+  location  = {Auckland, New Zealand},
+  series    = {AAMAS '20},
+}
+%  abstract  = {Policy gradient and actor-critic algorithms form the basis of many commonly used training techniques in deep reinforcement learning. Using these algorithms in multiagent environments poses problems such as nonstationarity and instability. In this paper, we first demonstrate that standard softmax-based policy gradient can be prone to poor performance in the presence of even the most benign nonstationarity. By contrast, it is known that the replicator dynamics, a well-studied model from evolutionary game theory, eliminates dominated strategies and exhibits convergence of the time-averaged trajectories to interior Nash equilibria in zero-sum games. Thus, using the replicator dynamics as a foundation, we derive an elegant one-line change to policy gradient methods that simply bypasses the gradient step through the softmax, yielding a new algorithm titled Neural Replicator Dynamics (NeuRD). NeuRD reduces to the exponential weights/Hedge algorithm in the single-state all-actions case. Additionally, NeuRD has formal equivalence to softmax counterfactual regret minimization, which guarantees convergence in the sequential tabular case. Importantly, our algorithm provides a straightforward way of extending the replicator dynamics to the function approximation setting. Empirical results show that NeuRD quickly adapts to nonstationarities, outperforming policy gradient significantly in both tabular and function approximation settings, when evaluated on the standard imperfect information benchmarks of Kuhn Poker, Leduc Poker, and Goofspiel.},
+%  keywords = {multiagent, reinforcement learning, regret minimization, games}
+%}
+
+@article{Amari1998,
+  author    = {Amari, Shun-ichi},
+  title     = {Natural Gradient Works Efficiently in Learning},
+  journal   = {Neural Computation},
+  volume    = {10},
+  number    = {2},
+  pages     = {251-276},
+  year      = {1998},
+  month     = {02},
+  issn      = {0899-7667},
+  doi       = {10.1162/089976698300017746},
+}
+%  eprint    = {https://direct.mit.edu/neco/article-pdf/10/2/251/813415/089976698300017746.pdf},
+%  url       = {https://doi.org/10.1162/089976698300017746},
+%  abstract  = {When a parameter space has a certain underlying structure, the ordinary gradient of a function does not represent its steepest direction, but the natural gradient does. Information geometry is used for calculating the natural gradients in the parameter space of perceptrons, the space of matrices (for blind source separation), and the space of linear dynamical systems (for blind source deconvolution). The dynamical behavior of natural gradient online learning is analyzed and is proved to be Fisher efficient, implying that it has asymptotically the same performance as the optimal batch estimation of parameters. This suggests that the plateau phenomenon, which appears in the backpropagation learning algorithm of multilayer perceptrons, might disappear or might not be so serious when the natural gradient is used. An adaptive method of updating the learning rate is proposed and analyzed.},
 %}
 
 @book{Montresor2014,

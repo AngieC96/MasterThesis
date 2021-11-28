@@ -71,8 +71,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Algorithms                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{algorithm}
-\usepackage{algpseudocode}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+\usepackage[ruled]{algorithm2e}
+
+%\algdef{SE}[LOOP]{Loop}{EndLoop}[1]{\algorithmicloop\ #1\ }{\algorithmicend\ }%
+\SetKwBlock{Loop}{Loop}{end}
+\SetKw{Break}{break}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,11 +102,13 @@
 {20pt}
 {\Huge}
 
+\setcounter{secnumdepth}{4}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TOC                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{tocbibind} % \usepackage[nottoc]{tocbibind}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Index | To be loaded before hyperref                    %
@@ -139,7 +146,7 @@
     pdftitle={Optimizing fault search in power grid outages through Reinforcement Learning},
     pdfauthor={Angela Carraro}
 }
-\newcommand{\algorithmautorefname}{Algorithm} % To autoreference Algorithms
+%\newcommand{\algorithmautorefname}{Algorithm} % To autoreference Algorithms
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Glossary and acronyms | To be loaded after hyperref     %
@@ -173,6 +180,7 @@
 \def\THsupervisor{Antonio Celani, ICTP}
 \def\THcosupervisor{Andrea Zancola, AcegasApsAmga}
 \def\THextracosupervisor{Luca Bortolussi, UniTS}
+\def\THextracosupervisortwo{Emanuele Panizon, ICTP}
 \def\THtitle{Optimizing fault search in power grid outages through Reinforcement Learning}
 \def\THdate{\monthyear\today}
 \def\THplace{Trieste}
@@ -189,7 +197,19 @@
 
 \input{frontmatter/titlepage}
 
-\include{frontmatter/abstract}
+\cleardoublepage
+\thispagestyle{empty}
+\vspace*{\stretch{1}}
+\begin{flushright}
+    \itshape A Matteo
+\end{flushright}
+\vspace{\stretch{3}}
+\clearpage
+\thispagestyle{empty}
+
+
+\include{frontmatter/abstract_ita}
+\include{frontmatter/abstract_eng}
 
 % Table of contents
 \tableofcontents
