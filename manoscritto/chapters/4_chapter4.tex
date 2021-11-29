@@ -176,7 +176,7 @@ while for continuous problems the Gaussian distribution is used
 \end{equation}
 where $\theta_2$ is an exploration parameter, and $\phi(s,a) \in \mathbb R^{d}$ is a feature vector characterizing state $s$ and action $a$ \cite{Sutton2000}.
 
-To learn the policy parameters $\boldsymbol \theta$, we will use the  gradient of some scalar \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ --- which can also directly be the expected return --- with respect to the policy parameters. If the performance $J_\pi(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J_\pi(\boldsymbol \theta)$:
+To learn the policy parameters $\boldsymbol \theta$, we will use the gradient of some scalar \emph{performance measure}\index{performance measure} $J_\pi(\boldsymbol \theta)$ --- which can also directly be the expected return --- with respect to the policy parameters. If the performance $J_\pi(\boldsymbol \theta)$ measures the rewards that the agent receives, we want to maximize it, so we update the parameters approximating gradient \textit{ascent} in $J_\pi(\boldsymbol \theta)$:
 \begin{equation}
     \boldsymbol \theta_{k+1} = \boldsymbol \theta_k + \alpha \nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta_k) \, .
     \label{eq:grad-ascent}
@@ -219,7 +219,7 @@ Thus, solving the expression for \eqref{eq:gradJ} and using it in equations \eqr
 \subsection{Natural policy gradient}
 \label{sec:npg}
 
-Ref.~\cite{Amari1998} introduces the \emph{natural gradient learning method}\index{natural gradient learning method}, which is a different way of performing a gradient descent for supervised learning problems, using a different formula for the gradient. This method is proven to be statistically efficient and does not get stuck in plateaus, like the conventional stochastic gradient learning does. This is because the ordinary gradient of a function, in some parameters spaces, does not identify its steepest direction, while the natural gradient does.
+Ref.~\cite{Amari1998} introduces the \emph{natural gradient learning method}\index{natural gradient learning method}, which is a different way of performing a gradient descent for supervised learning problems, using a different formula for the gradient. This method is proven to be statistically efficient and does not get stuck in plateaus, as the conventional stochastic gradient learning does. This is because the ordinary gradient of a function, in some parameters spaces, does not identify its steepest direction, while the natural gradient does.
 
 This method has also been applied in \acrshort{rl} in policy gradient algorithms \cite{Peters2008}, by replacing the gradient $\nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta)$ with the \emph{natural gradient}\index{natural gradient} $\widetilde \nabla_{\boldsymbol \theta} J_\pi(\boldsymbol \theta)$ when performing the parameters' updates. The difference is that the first follows the steepest direction in the parameter space, while the latter follows the steepest direction with respect to the Fisher metric, given by
 \begin{equation}
