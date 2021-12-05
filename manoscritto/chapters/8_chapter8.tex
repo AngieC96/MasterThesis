@@ -21,19 +21,21 @@ We first implemented the ordinary policy gradient descent (\acrshort{pg}), using
 
 These two algorithms find a policy that is not completely deterministic: in fact, some states have a stochastic policy over their possible actions. This means that we are on a side of the simplex which represents the policy space, and not in a corner. However, when, given a fault, we followed the actions dictated by the policy, we ended up only in states with a deterministic choice of the action to be performed. In particular, an interesting thing to notice is that, in the initial state, the policy always prescribes to go to the substation in the middle, like the bisection algorithm. Then, for subsequent substations, the two policies begin to differ, giving very different results, as we will see later.
 
-The first thing to look at in a policy gradient algorithm is whether the gradient descent reached convergence. The first, immediate, check is to see if the error is decreasing. We checked this both for the \acrshort{pg} algorithm and for the \acrshort{npg} algorithm, and both of them were decreasing, as we can see from the plots (in logarithmic scale) of \autoref{fig:errors}. In the left panel we have the errors of the ordinary policy gradient: we can see that, even in logarithmic scale, they are an exponential function; this means that they are a double exponential (\colorbox{yellow}{thing confirmed by the fact that, if we take the logarithm once more, we get a straight line}), and this explains/is consistent with the very slow convergence of the algorithm. Instead, in the right panel we can see the errors of the natural policy gradient: here we have two lines with different slopes, which indicates that initially the errors decreases faster, while after about $100$ steps it starts decreasing according to an exponential with a lower rate.
+The first thing to look at in a policy gradient algorithm is whether the gradient descent reached convergence. The first, immediate, check is to see if the error is decreasing. We checked this both for the \acrshort{pg} algorithm and for the \acrshort{npg} algorithm, and both of them were decreasing, as we can see from the plots of \autoref{fig:errors}. In the left panel we have the errors of the ordinary policy gradient with both axes in logarithmic scale. Since we have two straight segments, the errors follow two different decreasing power laws; until just before $10^2$ steps, the errors decrease slowly, while afterwards they decrease faster.
+%; which is consistent with the very slow convergence of the algorithm.
+Instead, in the right panel we can see the errors of the natural policy gradient: here we have two lines with different slopes, which indicates that initially the errors decrease faster, while after about $100$ steps they start decreasing according to an exponential with a lower rate.
 
 \begin{figure}[htb]
     \centering
     \mbox{
-        \hspace*{-10pt}\includegraphics[scale=0.52]{chapters/figures/errors_log_PG.png}
+        \hspace*{-10pt}\includegraphics[scale=0.52]{chapters/figures/errors_log_log_PG.png}
         \hspace*{-5pt}\includegraphics[scale=0.52]{chapters/figures/errors_log_NPG.png}
     }
-    \caption{Left: \acrshort{npg} errors, right: \acrshort{pg} errors; both for $5$ initially disconnected substations. They are both decreasing, so the gradient descent is following a minimum, as we want it to do.}
+    \caption{On the left there are the \acrshort{pg} errors, while on the right the \acrshort{npg} ones, both for $5$ initially disconnected substations. They are both decreasing, so the gradient descent is following a minimum, as we want it to do.}
     \label{fig:errors}
 \end{figure}
 
-However, this is not enough to say that the algorithm converged, this is a mere indicator that the gradient descent is indeed following the gradient and moving towards a minimum. Thus, what we did next was to examine the trajectories of the parameters $\boldsymbol \theta$ in the parameters space and the trajectories of the policies $\pi_{\boldsymbol \theta}$ in the policy space. In \autoref{fig:sequence-theta-pg} and \autoref{fig:sequence-policies-pg} we can see these two quantities for the \acrshort{pg}, where we selected a specific episode with $5$ initially disconnected substation and the fault among the second and the third substation. In \autoref{fig:sequence-theta-npg} and \autoref{fig:sequence-policies-npg} we can see these two quantities for the \acrshort{npg} for the same exact episode. In each panel we have as title the state we are in, and the plot represents the trajectory of the parameters $\boldsymbol \theta$ or the policy $\pi_{\boldsymbol \theta}$ for that specific state. Thus, we can see the parameters or the value of the policy for each specific action that can be taken in that state. The numbers in the states and in the labels represent the codes of the substations, and the faulty cable is indicated with the codes of the two substations at its ends. The subsequent panels represent the next states in which we end up taking the action suggested by the policy in the previous panel.
+However, this is not enough to say that the algorithm converged, this is a mere indicator that the gradient descent is indeed following the gradient and moving towards a minimum. Thus, what we did next was to examine the trajectories of the parameters $\boldsymbol \theta$ in the parameters space and the trajectories of the policies $\pi_{\boldsymbol \theta}$ in the policy space. In \autoref{fig:sequence-theta-pg} and \autoref{fig:sequence-policies-pg} we can see these two quantities for the \acrshort{pg}, where we selected a specific episode with $5$ initially disconnected substation and the fault among the second and the third substation. In \autoref{fig:sequence-theta-npg} and \autoref{fig:sequence-policies-npg} we can see these two quantities for the \acrshort{npg} for the same exact episode. In each panel, the current state is reported in the title, and the plot represents the trajectory of the parameters $\boldsymbol \theta$ or the policy $\pi_{\boldsymbol \theta}$ for that specific state. Thus, we can see the parameters or the value of the policy for each specific action that can be taken in that state. The numbers in the states and in the labels represent the codes of the substations, and the faulty cable is indicated with the codes of the two substations at its ends. The subsequent panels represent the next states in which we end up taking the action suggested by the policy in the previous panel.
 
 \begin{figure}[!htp]
     \centering
@@ -43,7 +45,7 @@ However, this is not enough to say that the algorithm converged, this is a mere 
         \hspace*{-10pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_PG_state_2.png} &
         \hspace*{-28pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_PG_state_3.png}
     \end{tabular}
-    \caption{\small Trajectories of the parameters $\boldsymbol \theta$ in the parameters space for \acrshort{pg}, for a specific episode (which starts in the top-left corner and ends in the bottom-right one) with $5$ initially disconnected substation.}
+    \caption{\small Trajectories of the parameters $\boldsymbol \theta$ in the parameters space for \acrshort{pg}, for a specific episode (which starts in the top-left corner and goes from left to right, line by line) with $5$ initially disconnected substation.}
     \label{fig:sequence-theta-pg}
 \end{figure}
 
@@ -64,10 +66,10 @@ However, this is not enough to say that the algorithm converged, this is a mere 
     \begin{tabular}{cc}
         \includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_0.png} &
         \includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_1.png} \\
-        \hspace*{-10pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_2.png} &
-        \hspace*{-28pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_3.png}
+        \hspace*{9pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_2.png} &
+        \hspace*{-26.7pt}\includegraphics[scale=0.36,valign=b]{chapters/figures/theta_NPG_state_3.png}
     \end{tabular}
-    \caption{Trajectories of the parameters $\boldsymbol \theta$ in the parameters space for \acrshort{npg}, for a specific episode (which starts in the top-left corner and ends in the bottom-right one) with $5$ initially disconnected substation.}
+    \caption{Trajectories of the parameters $\boldsymbol \theta$ in the parameters space for \acrshort{npg}, for a specific episode (which starts in the top-left corner and goes from left to right, line by line) with $5$ initially disconnected substation.}
     \label{fig:sequence-theta-npg}
 \end{figure}
 
@@ -100,18 +102,29 @@ We can clearly see that the policy gradient algorithms are the better ones, with
 \begin{figure}[bh]
     \centering
     \includegraphics[scale=0.8]{chapters/figures/comparison_graph.png}
-    \caption{Comparison of the values of the performance measure $J_\pi (\boldsymbol \theta)$ among the various algorithm for different numbers of initially disconnected substations.}
+    \caption{Comparison of the values of the performance measure $J_\pi (\boldsymbol \theta)$ among the various algorithms for different numbers of initially disconnected substations.}
     \label{fig:comparison-graph}
 \end{figure}
-
-%In \autoref{fig:scatterplot} we can see a plot of the costs for different positions of the fault of the \acrshort{pg} and the bisection algorithms. We considered only the faults on the electrical cables, otherwise there would have been too many points, and since according to the data collected by the technicians they are the most frequent ones, they are the most representative. We have indicated with \texttt{f1} the fault between the first remotely controlled substation and the first disconnected substation, with \texttt{f2} the fault between the first and the second disconnected substations, with \texttt{f3} the fault between the second and the third disconnected substations, and so on so forth. We can see that for some positions of the fault, the bisection algorithm is actually better than the \acrshort{pg} one. But as the value of $J_\pi(\boldsymbol \theta)$, represented by the horizontal lines, is lower in the \acrshort{pg}, we have that on average the latter is better.
-
-In \autoref{fig:scatterplot} we can see the two lines of the \acrshort{npg} and bisection algorithms for $J_\pi(\boldsymbol \theta)$ of the previous plot (the darker dots), with an addition. In fact, we also plotted the performance measure $J_\pi(\boldsymbol \theta)$ computed for a specific position of the fault, for every possible position of the fault and for different numbers of initially disconnected substations (the lighter dots). We considered only the faults on the electrical cables, otherwise there would have been too many points, and since according to the data collected by the technicians they are the most frequent ones, they are the most representative. We can see that, only with $11$ and $12$ initially disconnected substations, for some positions of the fault, the bisection algorithm is actually a bit better than the \acrshort{npg} one, as some orange points are under some blue points. Instead, for the other numbers of initially disconnected substations, the policy gradient is always better than the bisection. In any case, what is important is that on average the \acrshort{npg} is always better, as the value of $J_\pi(\boldsymbol \theta)$ is lower, which was our goal.
 
 \begin{figure}[htb]
     \centering
     \includegraphics[scale=0.8]{chapters/figures/comparison_graph_scatterplot.png}
-    \caption{Comparison of the values of the performance measure $J_\pi (\boldsymbol \theta)$ between \acrshort{npg} and bisection (darker dots), with also the values for every specific position of the fault (lighter dots), for different numbers of initially disconnected substations.}
-    %Costs for different positions of the fault, determined following the policy, in a scenario having $11$ initially disconnected substations. The horizontal lines are the values of $J_\pi(\boldsymbol \theta)$, which  represents the average cost.}
+    \caption{Comparison of the values of the performance measure $J_\pi (\boldsymbol \theta)$ between \acrshort{npg} and bisection (darker dots), along with the values for every specific position of the fault (lighter dots), for different numbers of initially disconnected substations.}
+    \label{fig:comparison-scatterplot}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    \includegraphics[scale=0.8]{chapters/figures/scatterplot.png}
+    \caption{Costs for different positions of the fault in a scenario having $11$ initially disconnected substations. The horizontal lines represent the average cost.}
     \label{fig:scatterplot}
 \end{figure}
+
+In \autoref{fig:comparison-scatterplot} we can see the two lines of the \acrshort{npg} and bisection algorithms for $J_\pi(\boldsymbol \theta)$ of the previous plot (the darker dots), with an addition. In fact, we also plotted the performance measure $J_\pi(\boldsymbol \theta)$ computed for a specific position of the fault,
+meaning that we allowed $x_g$ to take only one specific position at a time, and we iterated over every possible value of that variable and over different numbers of initially disconnected substations (the lighter dots). We considered only the faults on the electrical cables, otherwise there would have been too many points, and since according to the data collected by the technicians they are the most frequent ones, they are the most representative. We can see that, with $11$ and $12$ initially disconnected substations, for some positions of the fault, the bisection algorithm is actually a slightly better than the \acrshort{npg} one, as some orange points are under some blue points. We notice a slight overlap with $5$ and $6$ substations as well, but it is not particularly significant.
+Instead, for the other numbers of initially disconnected substations, the policy gradient is always better than the bisection. In any case, what is important is that \emph{on average} the \acrshort{npg} is always better, as the value of $J_\pi(\boldsymbol \theta)$ is lower, which was our goal.
+
+In \autoref{fig:scatterplot} we can see a detail of the previous plot for $11$ initially disconnected substations. We computed the costs of the fault for different positions of the fault of the \acrshort{npg}, the bisection algorithm and an \acrshort{npg} ran only with that specific position for the fault. Even here we considered only the faults on the electrical cables, and \texttt{f1} indicates the fault between the first remotely controlled substation and the first disconnected substation, \texttt{f2} indicates the fault between the first and the second disconnected substations, and so on so forth.
+%We can see that for some positions of the fault, the bisection algorithm is actually better than the \acrshort{pg} one. But as the value of $J_\pi(\boldsymbol \theta)$, represented by the horizontal lines, is lower in the \acrshort{pg}, we have that on average the latter is better.
+We can notice that, if we perform a gradient descent with only a possible position of the fault, the \acrshort{npg} is able to optimize for it, and finds a lower value for the cost than the general \acrshort{npg}.
+However, we have to remember that the fault specific \acrshort{npg} assumes that we know the position of the fault, so it is not applicable in our case, since it has a policy for every position of the fault, and not a general one that we can use when we don't know the position of the fault.
