@@ -1,4 +1,4 @@
-# MDP
+MDP
 
 
 
@@ -504,7 +504,7 @@ Questa è la condizione perché $x^*$ sia un punto di minimo. Che include il cas
 
 Domanda: come sta ottenendo vantaggio dal fatto di fare scelte random? Nel momento in cui si prende una policy random, questo vuol dire che stai ottimizzando sempre in media, perché non c'è altra stocasticità tranne quella presente nelle azioni prese prima, tutto il resto è deterministico. Cosa vuol dire? Che è meglio, ma certe volte farà più e certe volte farà meno. Quindi un check da fare è, nell'esecuzione della policy, cioè facendola girare, qual è la distribuzione dei costi effettivi (quelli random, non di $J$ che è già la media)?
 
-==Con $J$ io sto ottimizzando in MEDIA!== Se volessimo ottimizzare con un peso del rischio avremmo dovuto formulare il problema diversamente, con un altro tipo di obbiettivo, eccetera. Quello che si può fare a posteriori è dire: questo è il $J$, però tenete conto che seguendo questa policy nella sua randomicità, lei va da un minimo di tot ad un massimo di tot. Rappresentare l'effetto dell'aleatorietà della policy stessa: descrizione della policy che troviamo. Nel caso ci fosse che qualche valore che va al di sopra, uno dice: guardata che questa policy qua, in questo contesto, ha una certa probabilità di fare peggio di bisezione, anche se in media farà molto meglio.
+==Con $J$ io sto ottimizzando in MEDIA!== Se volessimo ottimizzare con un peso del rischio avremmo dovuto formulare il problema diversamente, con un altro tipo di obbiettivo, eccetera. Quello che si può fare a posteriori è dire: questo è il $J$, però tenete conto che seguendo questa policy nella sua randomicità, lei va da un minimo di tot ad un massimo di tot. Rappresentare l'effetto dell'aleatorietà della policy stessa: descrizione della policy che troviamo. ==Nel caso ci fosse che qualche valore che va al di sopra, uno dice: guardata che questa policy qua, in questo contesto, ha una certa probabilità di fare peggio di bisezione, anche se in media farà molto meglio.== Essendoci la componente stocastica della posizione del guasto, il costo del guasto può variare rispetto alla media trovata da J, risultando maggiore o minore a seconda del caso.
 
 ✔️ Il messaggio di questo lavoro non è che l'algoritmo di PG batte la bisezione in una maniera diversa, che era una possibilità tra le tante, può essere che con un'altra struttura dei costi questo non succeda. Non è importante, l'importante è che questo è un metodo / una metodologia sistematico/a per trovare policy ottimali in un contesto di questo tipo, che è un contesto sostanzialmente model-based, in cui si sanno le conseguenze delle proprie azioni.
 
@@ -513,6 +513,22 @@ Domanda: come sta ottenendo vantaggio dal fatto di fare scelte random? Nel momen
 ✔️ Ultima considerazione in fondo a tutto, chiaramente poi nella vita reale questi costi possono essere random, perché dipendono dalle condizioni ambientali, dalle cose imprevedibili, ...; a quel punto bisogna ricorrere a tutt'altra classe di algoritmi, che sono algoritmi model-free, in cui non si sa esattamente come modellizzare queste incertezze / questi costi etc, che però non fanno parte di questo lavoro qua e sarebbero però interessanti e buonasera.
 
 ✔️ Citare anche le cose possibili con linear programming.
+
+
+
+#### Scatterplot
+
+Questo risultato dal punto di vista pratico non è molto importante, perché saper dire al policy gradient "Guarda che il tuo guasto è qua", anche se tu non lo osservi, è comunque una cosa un po' strana. Quindi questa inizializzazione del guasto di per sè non è che sia praticamente molto importante. Però è importante per capire che se uno dice, all'inizio, assumo una certa probabilità che il guasto avvenga in certi cavi / stazioni, questo condiziona il tipo di policy che il policy gradient chiaramente trova. Mentre bisezione, rispetto a questa cosa qua, ha una sequenza di operazioni che sono completamente indipendenti da questa conoscenza a priori. Questo è l'unico aspetto importante. Perché poi nelle applicazioni questo policy gradient specifico non è che ha un come farlo, a meno che uno non ti dica, a parte, "guarda che il guasto è lì", però a questo punto se sai che il guasto è lì, se hai questa informazione non ha molto senso fare altre cose (= lo risolvi subito andando nelle due stazioni a fianco).
+
+Era soltanto per mettere in luce il fatto che differenti inizializzazioni della distribuzione sugli stati (=sui guasti) portano a differenti performace della policy. E' un caso estremo diciamo. C'è il caso uniforme e poi c'è il caso in cui uno dice "Guarda è lì ed è veramente lì" e allora uno vede l'algoritmo cosa fa.
+
+La policy, la sequenza di operazioni, non dipende dallo stato completo e quindi non può vedere dove è il guasto. Tuttavia è cambiato l'obbiettivo: quello che stiamo guardando qui è il costo in corso per una policy che non sa dove è il guasto ma il guasto avviene sempre nello stesso cavo. Quindi, per come la policy è costruita, succede che in quel caso lì lo prende in un colpo solo, ma cambiando i costi cambierà anche questa cosa qui, non è una proprietà, è solo un caso.
+
+La cautela è nel presentare questi confronti dettagliati tra policy gradient e bisezione. Il messaggio è che il policy gradient fa il meglio che può data quella aspettativa sulla distribuzione dei guasti, che è uniforme. Quei risultati tra PG e bisezione dicono che "guarda che questa strategia in assenza di informazioni è la migliore, ma se ci fosse un'informazione specifica su dove è il guasto, allora si potrebbe fare ancora meglio".
+
+Notiamo che, se inizializziamo diversamente la nostra aspettativa di dove è il guasto, otteniamo risultati differenti. In particolare, se partiamo da una situazione in cui il guasto si ripete sempre nello stesso cavo, ma chiaramente l'operatore non lo sa (non ha nessuna informazione a priori su questo), allora la policy del PG predice questi costi.
+
+
 
 
 
