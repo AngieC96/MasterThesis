@@ -117,8 +117,8 @@
 % Index | To be loaded before hyperref                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{imakeidx}
-%\usepackage[columns=2]{idxlayout} % , font=small
-\makeindex[intoc]
+%\usepackage{idxlayout} % [columns=2, font=small]
+\makeindex[intoc,options={-s main.mst}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Hyperref configuration                                  %
@@ -225,21 +225,25 @@
 
 % Introduction
 
+\part{Introduction and state of the art} % Background
+
 \include{chapters/1_chapter1}
 
+\include{chapters/2_chapter2}
 
-\include{chapters/4_chapter4}
 
 
 %\part{Data Management}
-
-\include{chapters/2_chapter2}
 
 
 %\include{chapters/3_chapter3}
 
 
-%\part{Reinforcement Learning} %{Algorithms}
+%\part{Reinforcement Learning} %{Algorithms} % What we did
+%\part{Our approach to Reinforcement Learning}
+\part{An approach through Reinforcement Learning}
+
+\include{chapters/4_chapter4}
 
 \include{chapters/5_chapter5}
 

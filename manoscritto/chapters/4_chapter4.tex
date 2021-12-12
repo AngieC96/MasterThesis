@@ -160,6 +160,10 @@ A \emph{policy gradient method}\index{policy gradient method} is a policy-based 
 
 Policy gradient methods present some perks that make them highly valuable: the parametrized policy allows for direct incorporation of potential environment insights, they can naturally switch from the discrete setting to the continuous one, and they converge to at least a locally optimal policy, even if, as a drawback, the convergence can be very slow and finding the global optimum instead of a local one can be hard \cite{Peters2010}. Another distinctive trait of these methods is that they can also naturally handle partial state information. In fact, if a state variable cannot be observed, then we can choose the policy parametrization such that the parameters do not depend on that state variable. Thus, we can directly apply these methods to \acrshort{pomdp}s, without having to make any changes.
 
+
+\subsection{Policy gradient}
+\label{sec:pg}
+
 We will denote the policy's parameters' vector with $\boldsymbol \theta \in \mathbb R^{d}$, and we will write, as in \eqref{eq:policy-theory},
 \begin{equation}
     \pi(a|s,\boldsymbol \theta) = \text{Pr}\{A_t = a | S_t = s; \boldsymbol \theta_t = \boldsymbol {\theta}\} \, ,
@@ -201,7 +205,7 @@ where we define as $\rho_0(s')$ the probability that an episode begins in state 
 
 Let us define $\eta_\pi(s')$ as the average number of time steps that the agent spends in state $s'$ before the process terminates. Time is spent in a state $s'$ if episodes start in that state $s'$, or if the environment transitions into $s'$ from a previous state $s$ in which time is spent. Thus, we have that the formula for $\eta_\pi$ is
 \begin{equation}
-    \eta_\pi(s') = \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a|s) p(s'|s, a), \; \text{for all } s' \in \mathcal S.
+    \eta_\pi(s') = \rho_0(s') + \gamma \sum_s \eta_\pi(s) \sum_a \pi(a|s) p(s'|s, a), \; \text{for all } s' \in \mathcal S.
     \label{eq:eta}
 \end{equation}
 This is a \textit{linear system} of equations, one for each state $s' \in \mathcal S$, and it can be solved for the expected number of visits $\eta_\pi(s)$.
