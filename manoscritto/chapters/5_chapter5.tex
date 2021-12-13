@@ -17,7 +17,7 @@ Given that we don't know the position of the fault, but we have to find it while
 
 We define the \emph{state}\index{state} $s$ of the environment as the tuple
 \begin{equation}
-    s = (x_g, v_k, \{v\})
+    s = (x_g, v_k, \{v\}) \, ,
 \end{equation}
 where $x_g$ is the position of the fault, $v_k \in \mathcal C$ is the substation at which the technician is currently located, and $\{v\}$ is the set of substations still disconnected after the technician operates in the current substation $v_k$. The set $\{v\}$ can also be chosen to be the set of substations already reconnected, since they are complementary with respect to the set $|\mathcal C|$, but we chose to use the disconnected substations to ease the notation. Since the position of the fault is unknown, the variable $x_g$ is \emph{hidden}, while the variables $v_k$ and $\{v\}$ are \emph{observable}. When the fault occurs, the technician can be everywhere: at home if it happens in the middle of the night, at the company, or on the go. So we introduce an extra dummy substation, called substation $0$, which is the position of the technician when the fault occurs. Given this, we have that the \emph{initial state} is always of the form $s_0 = (x_g, 0, \mathcal C)$, thus we have different initial states, one for every possible position of the fault. Instead, a \emph{terminal state} is of the form $s_t = (x_g, v_k, \varnothing)$. If the fault is localized on an electrical cable, then $v_k$ is one of the two substations at the ends of that faulty cable, so we have two different terminal states; while if the fault is in a substation, $v_k$ is that exact substation, so the terminal state is only one. We notice that the initial cost has a random component, which depends on the position of the technician when the fault occurs, so on the position of the substation $0$. To remove this randomness, we could also impose that the technician position is always at the company, but we chose not to do that, in order to be closer to what really happens.
 
@@ -43,13 +43,13 @@ We said that this is a problem with terminal states, which occur when we reconne
 
 Given all that, we have that the \emph{next state}\index{next-state} $s'$ of the environment is
 \begin{equation}
-    s' = (x_g, v_{k+1} = a, \{v'\}),
+    s' = (x_g, v_{k+1} = a, \{v'\}) \, ,
 \end{equation}
 where $\{v'\}$ is the set of disconnected substations after the technician operates in the substation $v_{k+1}$. Since the technician can always at least reconnect the substation they visit, the set of disconnected substations decreases after each action, so we have that $\{v'\} \subseteq \{v\} \backslash a$.
 
 Lastly, instead of the expected reward\index{expected reward}, we will define the \emph{expected cost}\index{expected cost} of going to a certain substation (as the time, in seconds, it takes to go there from where the technician is) multiplied by the number of disconnected users. Let's define as $d_{v_k, v_{k+1}}$ the time in seconds to go from the substation $v_k$ to the next substation $v_{k+1}$, and as $n_{k}$ the number of users still disconnected \emph{before} operating in the substation $v_{k+1}$. So if we are in a state $s = (x_g, v_k, \{v\})$, we make an action $a$, and we end up in a state $s' = (x_g, v_{k+1} = a, \{v'\})$, we have that the number of disconnected users is
 \begin{equation}
-    n_{k} = \sum_{v \in \{v\}} u_v,
+    n_{k} = \sum_{v \in \{v\}} u_v \, ,
 \end{equation}
 where $u_v$ is the number of users underneath the substation $v$. So the expected cost has the following formula:
 \begin{equation}
@@ -275,9 +275,9 @@ Given this, we have that
 \begin{equation}
     \begin{aligned}
         \nabla_{\theta_{o',a'}} J_\pi (\boldsymbol \theta)
-        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
-        &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)} \Big( \big( \delta_{a',a} - \pi(a'|o(s)) \big) \, \pi(a|o(s)) \Big) \\
-        &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) \sum_a Q_\pi \big((x_g, o'),a \big) \big( \delta_{a,a'} - \pi(a'|o') \big) \, \pi(a|o') \, ,
+        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \nabla_{\theta_{o',a'}} \pi(a|o(s); \boldsymbol \theta) \\
+        &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o',o(s)} \Big( \big( \delta_{a',a} - \pi(a'|o(s); \boldsymbol \theta) \big) \, \pi(a|o(s); \boldsymbol \theta) \Big) \\
+        &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) \sum_a Q_\pi \big((x_g, o'),a \big) \big( \delta_{a,a'} - \pi(a'|o'; \boldsymbol \theta) \big) \, \pi(a|o'; \boldsymbol \theta) \, ,
     \end{aligned}
     \label{eq:mygradJ}
 \end{equation}
@@ -317,7 +317,7 @@ in our case becomes, thanks to the equation of the natural gradient of $\pi$ use
 \begin{equation}
     \begin{aligned}
         \widetilde \nabla_{\theta_{o',a'}} J_\pi (\boldsymbol \theta)
-        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s)) \\
+        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s); \boldsymbol \theta) \\
         &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o', o(s)} \delta_{a',a} \\
         &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) Q_\pi \big((x_g, o'), a' \big)\, .
     \end{aligned}
