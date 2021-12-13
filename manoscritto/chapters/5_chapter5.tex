@@ -25,14 +25,14 @@ We then define the \emph{observation}\index{observation} $o$ that the agent sens
 \begin{equation}
     o = (v_k, \{v\}) \, ,
 \end{equation}
-and we will also write the state as $s=(x_g, o)$, where $o = (v_k, \{v\})$ is the observation itself. We define the observable $o$ to be a function of $s$:
+and we will also write the state as $s=(x_g, o)$, where $o = (v_k, \{v\})$ is the observation itself. We define the observation $o$ to be a function of $s$:
 \begin{equation}
     \begin{array}{cccc}
     o(s): & \mathcal S                                     & \rightarrow & \mathcal O       \\
           & s = (x_g, \, o = \left( v_k, \{v\} \right) \,) & \mapsto     & o = (v_k, \{v\})
 \end{array} \, .
 \end{equation}
-For different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only by the position of the fault $x_g$, this function associates the same observable $o = (v_k, \{v\})$. Thus, we have that $o$ is an equivalence class for $s$. For brevity, we will often keep this dependency implicit, and write simply $o$ instead of $o(s)$, meaning that $o = o(s)$. In particular, the observation of an initial state $s_0 = (x_g, 0, \mathcal C)$ is $o_0 = (0, \mathcal C)$.
+For different states $s = (x_g, \, o = \left( v_k, \{v\} \right) \,)$ that differ only by the position of the fault $x_g$, this function associates the same observation $o = (v_k, \{v\})$. Thus, we have that $o$ is an equivalence class for $s$. For brevity, we will often keep this dependency implicit, and write simply $o$ instead of $o(s)$, meaning that $o = o(s)$. In particular, the observation of an initial state $s_0 = (x_g, 0, \mathcal C)$ is $o_0 = (0, \mathcal C)$.
 
 We define the \emph{action}\index{action} $a$ that the agent can do as the choice of the specific substation the technician will visit as the next step, thus we have that $a \in \mathcal A = \mathcal C$. Actually, since the technician visits only disconnected substations, and never visits already visited substations, we have that $a \in \{v\}$, if we are in state $s = (x_g, v_k, \{v\})$. Thus, we have that the set of available actions depends on the current state:
 \begin{equation}
@@ -117,7 +117,7 @@ Knowing the model of the environment allows us to perform explicit computations 
 
 \subsection{Policy parametrization}
 
-Given that we are in a situation of partial observability, as we don't know the position of the fault, the \emph{policy}\index{policy} depends only on the observables and not on the state, so it doesn't know where the fault is. Let's define a parameterized policy using a simple \emph{tabular} parameterization, in which we have a parameter $\theta_{o,a}$ for each observable $o$ and action $a$ pair:
+Given that we are in a situation of partial observability, as we don't know the position of the fault, the \emph{policy}\index{policy} depends only on the observations and not on the state, so it doesn't know where the fault is. Let's define a parameterized policy using a simple \emph{tabular} parameterization, in which we have a parameter $\theta_{o,a}$ for each observation $o$ and action $a$ pair:
 \begin{equation}
     \boldsymbol \theta = (\theta_{o,a})_{o \in \mathcal O, a \in \mathcal A} = \begin{pmatrix}
         \theta_{o_1, a_1} & \theta_{o_1, a_2} & \cdots & \theta_{o_1, a_N} \\
@@ -162,7 +162,7 @@ which means that we randomly choose a substation to visit, since they all have t
 
 One of the advantages of using the soft-max distribution to parameterize policies is that, in the learning phase, we are able to choose a random action without introducing and manually tuning a $\varepsilon$ term, which we would otherwise need to perform some exploration alongside the exploitation. Instead, the stochasticity is intrinsic, since we don't perform a maximization over the actions, which is deterministic, but we choose an action according to its probability. In particular, if the optimal policy is stochastic, an $\text{argmax}$ would never be able to approximate it, not even with a $\varepsilon$ parameter, while the soft-max can do it by construction. On the contrary, if an action is deterministic, the soft-max can approach it as close as possible; in fact, the approximate policy can approach a deterministic policy without any problem. 
 
-If we search in this space of parametrized policies, this will give us a policy that doesn't depend on time, but only on the parameters, which we want to optimize. This means that, by construction, we have a \emph{stationary policy}. The reason for this choice is that, in our problem, the time is not encoded like a problem of dynamic programming, in which we have a well-defined sequence of time steps. The structure of the states is already a measure of time, as the number of moves already done: the sequence of substations we already visited. So what is important is not to establish a policy at different time steps, but to create a policy with respect to the states (in our case with respect to the observables).
+If we search in this space of parametrized policies, this will give us a policy that doesn't depend on time, but only on the parameters, which we want to optimize. This means that, by construction, we have a \emph{stationary policy}. The reason for this choice is that, in our problem, the time is not encoded like a problem of dynamic programming, in which we have a well-defined sequence of time steps. The structure of the states is already a measure of time, as the number of moves already done: the sequence of substations we already visited. So what is important is not to establish a policy at different time steps, but to create a policy with respect to the states (in our case with respect to the observations).
 
 
 \subsection{Value function and performance measure}
@@ -332,7 +332,7 @@ This is a very nice result, in that we have a very simple equation for the gradi
 
 First of all, we generated all the states of the system using \emph{backtracking}\index{backtracking}, a technique used to systematically generate all the admissible solutions of a problem (usually of combinatorial nature) \cite{Montresor2014}. It proceeds by incrementally building candidate solutions using recursion, checking at each step if a complete and valid solution is reached, and backtracking to explore other ones. In our case, the function starts from a complete initial state, so, besides the current position of the technician and the set of disconnected substations, it also requires the position of the fault, and it determines all the possible actions that can be taken from that state. Then it computes all the subsequent states, determining each time which substations can be reconnected by doing one of the possible actions, and it continues until it has reconnected all the substations. We can reconstruct all the possible states of the system by looping over all the possible positions of the fault, so on all the possible initial states. While constructing the states, the function also creates the states' dependency graph, in which, given a state, we can find all the possible states in which we can end up doing an admissible action. This is actually a forest of trees: each graph is a tree because we can never return to a previous state, and it is a forest since the states are grouped by the position of the fault: if we start in a given initial state we can never end up in a state with a different position of the fault.
 
-From the list of states, we create the list of observables, and we associate each state to its uniquely defined observation using a dictionary.
+From the list of states, we create the list of observations, and we associate each state to its uniquely defined observation using a dictionary.
 
 After having done that, we proceed to construct the matrix of parameters $\boldsymbol \theta$, initialized to zero, and the matrix of the policy $\pi_{\boldsymbol \theta}$, with the same dimensions of the previous one, using the soft-max parametrization.
 
