@@ -146,7 +146,15 @@
         We want to \alert{optimize the fault search} in power grid outages through \alert{Reinforcement learning}.
     \end{displayquote}
     
-    In particular, we use a \alert{policy gradient method} in a \alert{Partially Observable Markov Decision Process}, or POMDP. In particular, we perform a gradient descent in the policy space, using a parametrized policy specifically chosen so to it does not depend on the position of the fault, which is a \alert{hidden state variable}.
+    %In particular, we use a \alert{policy gradient method} in a \alert{Partially Observable Markov Decision Process}, or POMDP. In particular, we perform a gradient descent in the policy space, using a parametrized policy specifically chosen so to it does not depend on the position of the fault, which is a \alert{hidden state variable}.
+    
+    \alert{Why?}
+    \begin{itemize}
+        \item[\alert{$\bullet$}] The restoration process is done by the technicians using only their experience.
+        \medskip
+        \item[\alert{$\bullet$}] We want to exploit the data on the power grid that we have at our disposal.
+    \end{itemize}
+    \bigskip
     
     \begin{columns}[onlytextwidth]
         \begin{column}{.4\textwidth}
@@ -163,7 +171,7 @@
 \end{frame}
 
 {\putbg
-\section{The problem}
+\section{The restoration process}
 }
 
 \begin{frame}{Example of a power line in medium voltage}
@@ -207,7 +215,7 @@
 \end{frame}
 
 {\putbg
-\section{The mathematical framework}
+\section{The mathematical model}
 }
 
 \begin{frame}{The POMDP}
@@ -378,10 +386,6 @@
     
 \end{frame}
 
-{\putbg
-\section{The model}
-}
-
 \begin{frame}{The transition probability}
     
     The system is \alert{deterministic}, so, given an admissible action $a$, we will surely perform it and end up in the state to which that action leads.
@@ -400,7 +404,7 @@
 
 \begin{frame}{The policy}
 
-    The \alert{policy} depends only on the observable states, so it doesn't know where the fault is. Let's define a parameterized policy using the \emph{soft-max (i.e., Boltzmann) distribution}:
+    The \alert{policy} depends only on the observable variables, so it doesn't know where the fault is. Let's define a parameterized policy using the \emph{soft-max (i.e., Boltzmann) distribution}:
     \begin{equation*}
         \pi \Big( a \;\big|\; o=(v_k, \{v\}); \boldsymbol \theta \Big) = \frac{e^{\theta_{o,a} }}{\sum_{b \in \{v\}} e^{\theta_{o,b} }} \,.
     \end{equation*}
@@ -438,14 +442,14 @@
     \begin{align*}
             \rho_0 \Big(s = ( x_g, v_k, \{v\}) \Big)
             &= \text{Pr}(x_g) \mathbb I(o(s) = o_0 = (0, \mathcal C)) \\
-            &= \frac1{2|\mathcal C| + 1} \delta_{o(s), o_0} \, ;
+            &= \frac1{2|\mathcal C| + 1} \delta_{o(s), o_0} \, .
     \end{align*}
-    so $\rho_0$ is uniform in $x_g$ since it doesn't depend on the position of the fault.
+    so $\rho_0$ is uniform in $x_g$ since we do not know the position of the fault.
     
     Besides, we define the average number of time steps that the agent spends in state $s'$ before the process dies as
     \begin{align*}
-            \eta_\pi(s') &:= \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a | o(s); \boldsymbol \theta) p(s' | s, a) \\
-            &= \frac{1}{2|\mathcal C|+1} \delta_{o(s'), o_0} + \sum_{s \in \mathrm{pa}(s')} \eta_\pi(s) \pi(v_{k+1} | o(s); \boldsymbol \theta) \, ,
+            \eta_\pi\Big(s' = (\, x_g, o'=(v_{k+1}, \{v'\}) \,) \Big) &:= \rho_0(s') + \sum_s \eta_\pi(s) \sum_a \pi(a | o(s); \boldsymbol \theta) p(s' | s, a) \\
+            &= \frac{1}{2|\mathcal C|+1} \delta_{o', o_0} + \sum_{s \in \mathrm{pa}(s')} \eta_\pi(s) \pi(v_{k+1} | o(s); \boldsymbol \theta) \, ,
     \end{align*}
     
     \textbf{Notice} that the equations for both $Q_\pi$ and $\eta_\pi$ are \alert{linear systems}.
@@ -502,7 +506,11 @@
     
 \end{frame}
 
-\begin{frame}{Idea of the algorithm}
+{\putbg
+\section{Our algorithms}
+}
+
+\begin{frame}{The Policy Gradient (PG) algorithm}
 
     So we \textbf{parametrized the policy}, and we imposed that the parameters depend only on the observable variables. Now we try to find the best policy in this subspace in order to optimize the POMDP.
     
@@ -511,9 +519,35 @@
         \pi \left( a \;\big|\; o(s); \boldsymbol \theta \right) = \frac{e^{\theta}}{\sum_{b \in \{v\}} e^{\theta}} = \frac{e^{\theta}}{e^{\theta} \sum_{b \in \{v\}} 1 } = \frac1{ |\{v\}| } \, ,
     \end{equation*}
     
-    Then we perform a \alert{step of gradient descent on the parameters $\boldsymbol \theta$ of the policy}. We compute the gradient using the previous formula: the gradients of the policy are simple computations, while to compute $Q_\pi$ and $\eta_\pi$ you have to solve the corresponding linear equations for the current policy, so they \alert{have to be solved at each iteration of gradient descend}.
+    Then we \alert{perform gradient descent on the parameters $\boldsymbol \theta$ of the policy}. We compute the gradient using the previous formula: the gradients of the policy are simple computations, while to compute $Q_\pi$ and $\eta_\pi$ you have to solve the corresponding linear equations for the current policy, so they \alert{have to be solved at each iteration of gradient descend}.
     
 \end{frame}
+
+\begin{frame}{The Natural Policy Gradient (NPG) algorithm}
+
+    We only change the formula of the gradient, using the \alert{natural gradient} of the performance measure $J(\boldsymbol \theta)$, which is
+    \begin{equation*}
+        \widetilde \nabla_{\boldsymbol \theta} J(\boldsymbol \theta) = F^{-1}(\boldsymbol \theta) \nabla_{\boldsymbol \theta} J(\boldsymbol \theta) \, ,
+    \end{equation*}
+    
+    where $F$ is the \alert{Fisher information matrix}. In our case, we have that $F = \nabla_{\boldsymbol \theta} \pi_{\boldsymbol \theta}$, so
+    
+    \begin{equation*}
+        \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s)) = I_{(\mathcal O, \mathcal A) \times (\mathcal O, \mathcal A)} = \delta_{o', o(s)} \delta_{a',a} \, .
+    \end{equation*}
+    so it becomes
+    \begin{align*}
+        \widetilde \nabla_{\theta_{o',a'}} J_\pi (\boldsymbol \theta)
+        &= \sum_{s \in \mathcal S} \eta_\pi(s) \sum_{a \in \mathcal A(s)} Q_\pi(s,a) \widetilde \nabla_{\theta_{o',a'}} \pi(a|o(s); \boldsymbol \theta) \\
+        &= \sum_s \eta_\pi(s) \sum_a Q_\pi(s,a) \delta_{o', o(s)} \delta_{a',a} \\
+        &= \sum_{x_g} \eta_\pi \big((x_g, o') \big) Q_\pi \big((x_g, o'), a' \big)\, .
+    \end{align*}
+
+\end{frame}
+
+{\putbg
+\section{Results}
+}
 
 \begin{frame}{Convergence times of PG and NPG}
 
@@ -603,6 +637,18 @@
     
 \end{frame}
 
+\begin{frame}{Recap}
+
+    Thus, we optimized the fault search in power grid outages:
+
+    \begin{itemize}
+        \item[\alert{$\bullet$}] We modeled Trieste's power grid using \alert{graphs}.
+        \item[\alert{$\bullet$}] We modeled the current method used by the technicians to find the fault during the restoration process: the \alert{bisection} algorithm.
+        \item[\alert{$\bullet$}] We developed a new algorithm that was able to exploit the data that we have on the substations and to improve the restoration process: the \alert{(natural) policy gradient} algorithm.
+    \end{itemize}
+    
+\end{frame}
+
 {\putbgdark
 \begin{frame}[standout]
 	\begin{center}
@@ -617,7 +663,7 @@
 \section{Backup slides}
 }
 
-\begin{frame}{}
+\begin{frame}[noframenumbering]{}
 
     \begin{figure}
         \centering
@@ -626,7 +672,7 @@
     
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}[noframenumbering]{}
 
     \begin{figure}
         \centering
@@ -635,7 +681,7 @@
     
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}[noframenumbering]{}
 
     \vspace*{-10pt}
     \begin{figure}
@@ -646,7 +692,7 @@
     
 \end{frame}
 
-\begin{frame}{}
+\begin{frame}[noframenumbering]{}
 
     \begin{figure}
         \centering
